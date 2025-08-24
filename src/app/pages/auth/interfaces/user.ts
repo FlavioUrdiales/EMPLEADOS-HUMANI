@@ -1,0 +1,76 @@
+export interface User {
+    chrClave: string;
+    chrTipoUsuario: string;
+    chrModalidad: string;
+    chrClaveEscuela: string;
+    chrNombre: string;
+    chrPaterno: string;
+    chrMaterno: string;
+    dtFechaNacimiento: Date;
+    chrCurp: string;
+    chrDomicilio: string;
+    chrTelefono: string;
+    chrEmail: string;
+    chrHayActa: string;
+    chrFotoActa: string;
+    chrHayDomi: string;
+    chrEnAccidente: string;
+    chrRFC: string;
+    chrEscuelaProcedencia: string;
+    chrHayCertificado: string;
+    chrFotoCertPrep: string;
+    chrGenero: string;
+    chrPracticasProf: string;
+    chrServicioCom: string;
+    chrTerapia: string;
+    chrServicioSoc: string;
+    chrFotoServSoc: string;
+    chrHayCertLic: string;
+    chrFotoCertLic: string;
+    dtfIniServSoc: Date;
+    dtfFinServSoc: Date;
+    chrFolioServSoc: string;
+    chrFechaImpCertLic: string;
+    chrFolioCertLic: string;
+    chrNotas: string;
+    chrPassword: string;
+    intConsecutivoPago: number;
+    chrHayAdeudoBiblio: string;
+    chrHayAdeudoCom: string;
+    chrFoto: string;
+    cveCiclo: string;
+    chrStatus: string;
+    chrEspecialidad: string;
+    chrArchivoActadenacimiento: string;
+    chrArchivoCurp: string;
+    chrArchivoTituloProfesional: string;
+    chrArchivoCedulaProfesional: string;
+    chrArchivoComprobantededomicilio: string;
+    chrArchivoCurriculum: string;
+    chrArchivoCartadesituacionfiscal: string;
+    chrArchivoIne: string;
+    chrArchivoDiplomado: string;
+    chrArchivoPruebapsicometrica: string;
+    chrEstadoCivil: string;
+    chrTipodesangre: string;
+    chrNacionalidad: string;
+    chrUltimogradodeestudios: string;
+    chrTipodecontratacion: string;
+    chrContrato: string;
+    chrTipodehorario: string;
+    dtFechadealtaimss: Date;
+    dtFechadeingreso: Date;
+    chrNumerodeseguridadsocial: string;
+    fltSueldo: number;
+    chrEmergenciasnombre: string;
+    chrEmergenciastelefono: string;
+    chrEmergenciasdireccion: string;
+    chrCargo: string;
+    chrDepartamento: string;
+}
+
+/*[{"chrclaveusuario":"MSANCHEZ","chrclaveperfil":"crudalumno"},{"chrclaveusuario":"MSANCHEZ","chrclaveperfil":"crudmaestro"},{"chrclaveusuario":"MSANCHEZ","chrclaveperfil":"diplomadoSeresc"},{"chrclaveusuario":"MSANCHEZ","chrclaveperfil":"inscripcion"},{"chrclaveusuario":"MSANCHEZ","chrclaveperfil":"operador"},{"chrclaveusuario":"MSANCHEZ","chrclaveperfil":"reportes"},{"chrclaveusuario":"MSANCHEZ","chrclaveperfil":"serviciosEscola"}]*/
+export interface Permisos {
+    chrclaveusuario: string;
+    chrclaveperfil: string;
+}
