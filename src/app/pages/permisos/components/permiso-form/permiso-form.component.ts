@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -13,7 +13,8 @@ import { User } from '../../../auth/interfaces/user';
 import { getDatosUsuario } from '../../../../shared/helpers/permisos.helper';
 import { FormsModule } from '@angular/forms';
 import { formatDate } from '@angular/common';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 @Component({
@@ -32,10 +33,12 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
     TextareaModule,
     RadioButtonModule,
     ToastModule,
-    AutoCompleteModule
+    AutoCompleteModule,
+    ConfirmDialogModule
   ],
   templateUrl: './permiso-form.component.html',
-  styleUrls: ['./permiso-form.component.scss']
+  styleUrls: ['./permiso-form.component.scss'],
+  providers: [ConfirmationService]
 })
 export class PermisoFormComponent implements OnInit {
   form: FormGroup;
@@ -45,19 +48,19 @@ export class PermisoFormComponent implements OnInit {
   mostrarInfoContacto: boolean = false; // o false según tu lógica
 
   tiposPermiso = [
-  { label: 'Llegar tarde', value: 'llegar_tarde' },
-  { label: 'Faltar', value: 'faltar' },
-  { label: 'Salir temprano', value: 'salir_temprano' },
-  { label: 'No checó entrada', value: 'no_entrada' },
-  { label: 'No checó comida', value: 'no_comida' },
-  { label: 'Retardo horario de comida', value: 'retardo_comida' },
-  { label: 'No checó salida', value: 'no_salida' },
-  { label: 'Cambio de horario', value: 'cambio_horario' },
-  { label: 'Visita en oficina foránea', value: 'visita_oficina' },
-  { label: 'Falta por permiso de paternidad', value: 'permiso_paternidad' },
-  { label: 'Fallecimiento de familiar directo', value: 'fallecimiento_familiar' },
-  { label: 'Cambio de numero de usuario', value: 'cambio_usuario' }
-];
+    { label: 'Llegar tarde', value: 'llegar_tarde' },
+    { label: 'Faltar', value: 'faltar' },
+    { label: 'Salir temprano', value: 'salir_temprano' },
+    { label: 'No checó entrada', value: 'no_entrada' },
+    { label: 'No checó comida', value: 'no_comida' },
+    { label: 'Retardo horario de comida', value: 'retardo_comida' },
+    { label: 'No checó salida', value: 'no_salida' },
+    { label: 'Cambio de horario', value: 'cambio_horario' },
+    { label: 'Visita en plantel foráneo', value: 'visita_foraneo' },
+    { label: 'Falta por permiso de paternidad', value: 'permiso_paternidad' },
+    { label: 'Fallecimiento de familiar directo', value: 'fallecimiento_familiar' },
+    { label: 'Cambio de numero de usuario', value: 'cambio_usuario' }
+  ];
 
   estados = [
     { label: 'Pendiente', value: 'pendiente' },
@@ -67,18 +70,16 @@ export class PermisoFormComponent implements OnInit {
 
   correosSugeridos: any[] = [];
 
+  private confirmationService: ConfirmationService = inject(ConfirmationService);
+  private messageService: MessageService = inject(MessageService);
+  private fb: FormBuilder = inject(FormBuilder);
 
-
-
-  constructor(
-    private fb: FormBuilder,
-    private messageService: MessageService
-  ) {
+  constructor() {
     this.form = this.fb.group({
       id: [undefined],
       user_id: [undefined],
       nombre_colaborador: ['', Validators.required],
-      departamento: ['', Validators.required],
+      departamento: [''],
       correo_electronico: ['', [Validators.required, Validators.email]],
       correo_jefe: ['', [Validators.required, Validators.email]],
       fecha_inicio: [undefined],
@@ -129,7 +130,32 @@ export class PermisoFormComponent implements OnInit {
 
 
 
-  guardar() {
+guardar() {
+  let mensaje = '';
+
+  if (this.tipoFechaSeleccionado === 'rango' && this.form.value.rangoFechas?.length === 2) {
+    const [inicio, fin] = this.form.value.rangoFechas;
+    mensaje = `el rango de fechas: ${new Date(inicio).toLocaleDateString()} al ${new Date(fin).toLocaleDateString()}`;
+  } else if (this.tipoFechaSeleccionado === 'individual' && this.form.value.diasIndividuales?.length > 0) {
+    mensaje =
+      'los días: ' +
+      this.form.value.diasIndividuales
+        .map((d: Date) => new Date(d).toLocaleDateString())
+        .join(', ');
+  } else {
+    mensaje = 'las fechas seleccionadas';
+  }
+
+  this.confirmationService.confirm({
+    header: 'Confirmar solicitud',
+    message: `¿Seguro que quieres solicitar permiso para ${mensaje}?`,
+    accept: () => this.insertar(),
+    reject: () => this.cancelar(),
+  });
+}
+
+  insertar() {
+
     if (this.form.valid) {
       const value = this.form.value;
 
@@ -145,13 +171,13 @@ export class PermisoFormComponent implements OnInit {
       }
 
       console.log('Solicitud de permiso:', value);
-      this.messageService.add({severity:'success', summary:'Éxito', detail:'Solicitud guardada correctamente'});
-      
+      this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Solicitud guardada correctamente' });
+
       // Resetear el formulario después de guardar
       this.cancelar();
     } else {
       this.form.markAllAsTouched();
-      this.messageService.add({severity:'error', summary:'Error', detail:'Por favor, completa todos los campos requeridos'});
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Por favor, completa todos los campos requeridos' });
     }
   }
 
@@ -174,14 +200,14 @@ export class PermisoFormComponent implements OnInit {
 
     const fechaStr = this.nuevoDia.toISOString().split('T')[0]; // YYYY-MM-DD
     const dias = this.form.get('diasIndividuales')?.value as string[];
-    
+
     // Evitar duplicados
     if (!dias.includes(fechaStr)) {
       dias.push(fechaStr);
       this.form.get('diasIndividuales')?.setValue([...dias]);
       this.nuevoDia = undefined; // limpiar input
     } else {
-      this.messageService.add({severity:'warn', summary:'Advertencia', detail:'Esta fecha ya ha sido agregada'});
+      this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Esta fecha ya ha sido agregada' });
     }
   }
 
@@ -197,29 +223,29 @@ export class PermisoFormComponent implements OnInit {
   }
 
   toggleMotivo(valor: string) {
-  const motivos = this.form.get('motivos')?.value || [];
-  if (motivos.includes(valor)) {
-    this.form.get('motivos')?.setValue(motivos.filter((v: string) => v !== valor));
-  } else {
-    this.form.get('motivos')?.setValue([...motivos, valor]);
+    const motivos = this.form.get('motivos')?.value || [];
+    if (motivos.includes(valor)) {
+      this.form.get('motivos')?.setValue(motivos.filter((v: string) => v !== valor));
+    } else {
+      this.form.get('motivos')?.setValue([...motivos, valor]);
+    }
   }
-}
 
-buscarCorreos(event: any) {
-  const query = event.query.toLowerCase();
-  // ejemplo de filtrado, reemplazar por tu fuente real
-  const todosLosCorreos = [
-    'jefe1@empresa.com',
-    'jefe2@empresa.com',
-    'jefe3@empresa.com',
-  ];
-  this.correosSugeridos = todosLosCorreos.filter(c => c.toLowerCase().includes(query));
-}
+  buscarCorreos(event: any) {
+    const query = event.query.toLowerCase();
+    // ejemplo de filtrado, reemplazar por tu fuente real
+    const todosLosCorreos = [
+      'jefe1@empresa.com',
+      'jefe2@empresa.com',
+      'jefe3@empresa.com',
+    ];
+    this.correosSugeridos = todosLosCorreos.filter(c => c.toLowerCase().includes(query));
+  }
 
 
-isFieldInvalid(field: string): boolean {
-  const control = this.form.get(field);
-  return control?.invalid && (control.dirty || control.touched) || false;
-}
+  isFieldInvalid(field: string): boolean {
+    const control = this.form.get(field);
+    return control?.invalid && (control.dirty || control.touched) || false;
+  }
 
 }
