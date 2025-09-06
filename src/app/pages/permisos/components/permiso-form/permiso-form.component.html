@@ -161,7 +161,7 @@
             <div
               class="bg-white dark:bg-gray-700 p-2 rounded-lg max-h-40 overflow-y-auto flex flex-wrap gap-2 border border-gray-200 dark:border-gray-600 text-xs">
               <p-chip *ngFor="let dia of form.get('diasIndividuales')?.value || []; let i=index"
-                [label]="formatoDia(dia)" removable="true" (remove)="eliminarDia(i)" styleClass="bg-primary text-white">
+                [label]="formatoDia(dia)" removable="true" (onRemove)="eliminarDia(i)" styleClass="bg-primary text-white">
               </p-chip>
               <p *ngIf="!(form.get('diasIndividuales')?.value?.length)" class="text-gray-400 text-xs p-1">No hay días
               </p>

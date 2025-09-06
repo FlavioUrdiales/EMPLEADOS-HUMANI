@@ -17,6 +17,9 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { AutoCompleteModule } from 'primeng/autocomplete';
+import { PermisosService } from '../../services/permisos.service';
+import { ToastService } from '../../../../shared/services/toastService.service';
+import { CorreoJefe, TipoPermiso } from '../../interfaces/permisos.interface';
 @Component({
   selector: 'app-permiso-form',
   standalone: true,
@@ -43,36 +46,20 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 export class PermisoFormComponent implements OnInit {
   form: FormGroup;
   private user: User = getDatosUsuario();
+  private permisosService: PermisosService = inject(PermisosService);
+
   tipoFechaSeleccionado: 'rango' | 'individual' = 'rango';
   nuevoDia?: Date;
   mostrarInfoContacto: boolean = false; // o false según tu lógica
 
-  tiposPermiso = [
-    { label: 'Llegar tarde', value: 'llegar_tarde' },
-    { label: 'Faltar', value: 'faltar' },
-    { label: 'Salir temprano', value: 'salir_temprano' },
-    { label: 'No checó entrada', value: 'no_entrada' },
-    { label: 'No checó comida', value: 'no_comida' },
-    { label: 'Retardo horario de comida', value: 'retardo_comida' },
-    { label: 'No checó salida', value: 'no_salida' },
-    { label: 'Cambio de horario', value: 'cambio_horario' },
-    { label: 'Visita en plantel foráneo', value: 'visita_foraneo' },
-    { label: 'Falta por permiso de paternidad', value: 'permiso_paternidad' },
-    { label: 'Fallecimiento de familiar directo', value: 'fallecimiento_familiar' },
-    { label: 'Cambio de numero de usuario', value: 'cambio_usuario' }
-  ];
-
-  estados = [
-    { label: 'Pendiente', value: 'pendiente' },
-    { label: 'Aprobado', value: 'aprobado' },
-    { label: 'Rechazado', value: 'rechazado' }
-  ];
+  tiposPermiso: TipoPermiso[] = [];
 
   correosSugeridos: any[] = [];
 
   private confirmationService: ConfirmationService = inject(ConfirmationService);
   private messageService: MessageService = inject(MessageService);
   private fb: FormBuilder = inject(FormBuilder);
+  private toastService: ToastService = inject(ToastService);
 
   constructor() {
     this.form = this.fb.group({
@@ -96,6 +83,7 @@ export class PermisoFormComponent implements OnInit {
 
   ngOnInit(): void {
     // Prellenar datos del usuario
+    this.getTiposPermisos();
     this.form.patchValue({
       user_id: this.user.chrClave,
       nombre_colaborador: `${this.user.chrNombre} ${this.user.chrMaterno} ${this.user.chrPaterno}`,
@@ -117,6 +105,14 @@ export class PermisoFormComponent implements OnInit {
     });
   }
 
+  public getTiposPermisos() {
+    this.permisosService.getAllTiposPermisos().subscribe({
+      next: (resp) => {
+        this.tiposPermiso = resp;
+      }
+    });
+  }
+
   // Validadores personalizados
   private rangoFechasValidator(control: FormControl) {
     if (this.tipoFechaSeleccionado !== 'rango') return null;
@@ -130,29 +126,29 @@ export class PermisoFormComponent implements OnInit {
 
 
 
-guardar() {
-  let mensaje = '';
+  guardar() {
+    let mensaje = '';
 
-  if (this.tipoFechaSeleccionado === 'rango' && this.form.value.rangoFechas?.length === 2) {
-    const [inicio, fin] = this.form.value.rangoFechas;
-    mensaje = `el rango de fechas: ${new Date(inicio).toLocaleDateString()} al ${new Date(fin).toLocaleDateString()}`;
-  } else if (this.tipoFechaSeleccionado === 'individual' && this.form.value.diasIndividuales?.length > 0) {
-    mensaje =
-      'los días: ' +
-      this.form.value.diasIndividuales
-        .map((d: Date) => new Date(d).toLocaleDateString())
-        .join(', ');
-  } else {
-    mensaje = 'las fechas seleccionadas';
+    if (this.tipoFechaSeleccionado === 'rango' && this.form.value.rangoFechas?.length === 2) {
+      const [inicio, fin] = this.form.value.rangoFechas;
+      mensaje = `el rango de fechas: ${new Date(inicio).toLocaleDateString()} al ${new Date(fin).toLocaleDateString()}`;
+    } else if (this.tipoFechaSeleccionado === 'individual' && this.form.value.diasIndividuales?.length > 0) {
+      mensaje =
+        'los días: ' +
+        this.form.value.diasIndividuales
+          .map((d: Date) => new Date(d).toLocaleDateString())
+          .join(', ');
+    } else {
+      mensaje = 'las fechas seleccionadas';
+    }
+
+    this.confirmationService.confirm({
+      header: 'Confirmar solicitud',
+      message: `¿Seguro que quieres solicitar permiso para ${mensaje}?`,
+      accept: () => this.insertar(),
+      reject: () => this.cancelar(),
+    });
   }
-
-  this.confirmationService.confirm({
-    header: 'Confirmar solicitud',
-    message: `¿Seguro que quieres solicitar permiso para ${mensaje}?`,
-    accept: () => this.insertar(),
-    reject: () => this.cancelar(),
-  });
-}
 
   insertar() {
 
@@ -169,9 +165,19 @@ guardar() {
         value.fecha_inicio = new Date(diasOrdenados[0]);
         value.fecha_fin = new Date(diasOrdenados[diasOrdenados.length - 1]);
       }
+      let sendingData = {
+        data: { ...value }
+      };
+      this.permisosService.create(sendingData).subscribe({
+        next: (resp) => {
+          this.toastService.success('Permiso guardado con éxito');
 
-      console.log('Solicitud de permiso:', value);
-      this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Solicitud guardada correctamente' });
+        },
+        error: (err) => {
+          this.toastService.error('Error al guardar el permiso: ' + err.message);
+        }
+      });
+
 
       // Resetear el formulario después de guardar
       this.cancelar();
@@ -233,13 +239,12 @@ guardar() {
 
   buscarCorreos(event: any) {
     const query = event.query.toLowerCase();
-    // ejemplo de filtrado, reemplazar por tu fuente real
-    const todosLosCorreos = [
-      'jefe1@empresa.com',
-      'jefe2@empresa.com',
-      'jefe3@empresa.com',
-    ];
-    this.correosSugeridos = todosLosCorreos.filter(c => c.toLowerCase().includes(query));
+
+    this.permisosService.getAllCorreosJefes().subscribe({
+      next: (resp: CorreoJefe[]) => {
+        this.correosSugeridos = resp.map(cj => cj.correo).filter(c => c.toLowerCase().includes(query));
+      }
+    });
   }
 
 
