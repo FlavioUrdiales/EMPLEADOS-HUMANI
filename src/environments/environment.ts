@@ -7,6 +7,7 @@ export const environment = {
   ENDPOINT_PERMISOS : 'http://localhost:3000/permisos/',
   ENDPOINT_TIPOPERMISOS: 'http://localhost:3000/tipos_permiso/',
   ENDPOINT_CORREOSJEFES: 'http://localhost:3000/correos_jefes/',
+  ENDPOINT_CHECADOR: 'http://localhost:3000/checador/',
   VERSION: '0.0.0.1',
   permisosSistema: [ "superAdmin"],
   DESARROLLADOR: 'Flavio Urdiales Mena',

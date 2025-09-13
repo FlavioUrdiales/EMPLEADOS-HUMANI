@@ -1,86 +1,89 @@
 import { Injectable } from '@angular/core';
 import { MessageService } from 'primeng/api';
 
-@Injectable({
-    providedIn: 'root',
-})
+type MessageKey =
+  | 'not-results'
+  | 'save-success'
+  | 'update-success'
+  | 'delete-success'
+  | 'error-load'
+  | 'error-save'
+  | 'generic-error'
+  | 'load-success'
+  | 'select-option'
+  | 'not-valid'
+  | 'matricula-existe'
+  | 'bienvenido'
+  | 'session-expired';
+
+@Injectable({ providedIn: 'root' })
 export class ToastService {
-    constructor(private messageService: MessageService) { }
+  // Mapa de códigos numéricos
+  private readonly messagesByCode: Record<number, string> = {
+    200: 'Operación realizada.',
+    401: 'No autorizado.',
+    402: 'Datos no encontrados.',
+    403: 'Acceso denegado.',
+    404: 'No se encontró el recurso solicitado.',
+    500: 'Error en el servidor. Intente nuevamente.',
+    8004: 'La CURP ya se encuentra registrada.',
+  };
 
-    private getMensaje(key: string | number) {
-        if (typeof key === 'number') {
-            switch (key) {
-                case 404:
-                    return { severity: 'error', summary: 'Error', detail: 'No se encontró el recurso solicitado.' };
-                case 500:
-                    return { severity: 'error', summary: 'Error', detail: 'Error en el servidor. Intente nuevamente.' };
-                case 401:
-                    return { severity: 'error', summary: 'Error', detail: 'No autorizado.' };
-                case 403:
-                    return { severity: 'error', summary: 'Error', detail: 'Acceso denegado.' };
-                case 402:  
-                    return { severity: 'warn', summary: 'Advertencia', detail: 'Datos no encontrados.' };
-                case 8004:
-                    return { severity: 'error', summary: 'Error', detail: 'La CURP ya se encuentra registrada.' };
-                case 200:
-                    return { severity: 'success', summary: 'Éxito', detail: 'Operación realizada.' };
-                default:
-                    return { severity: 'warn', summary: 'Advertencia', detail: 'Se ha detectado un problema.' };
-            }
+  // Mapa de claves de texto
+  private readonly messagesByKey: Record<MessageKey, string> = {
+    'not-results': 'No se encontraron registros.',
+    'save-success': 'Datos guardados correctamente.',
+    'update-success': 'Datos actualizados correctamente.',
+    'delete-success': 'Datos eliminados correctamente.',
+    'error-load': 'Error al cargar datos. Intente nuevamente.',
+    'error-save': 'Error al guardar datos. Intente nuevamente.',
+    'generic-error': 'Error al realizar la operación. Intente nuevamente.',
+    'load-success': 'Datos cargados correctamente.',
+    'select-option': 'Seleccione al menos una opción.',
+    'not-valid': 'Datos no válidos o incompletos.',
+    'matricula-existe': 'La matrícula ya se encuentra registrada.',
+    'bienvenido': 'Bienvenido a la plataforma.',
+    'session-expired': 'Su sesión ha expirado. Inicie sesión nuevamente.',
+  };
 
-        }else {
-        switch (key) {
-            case 'not-results':
-                return { severity: 'error', summary: 'Error', detail: 'No se encontraron registros.' };
-            case 'save-success':
-                return { severity: 'success', summary: 'Éxito', detail: 'Datos guardados correctamente.' };
-            case 'update-success':
-                return { severity: 'success', summary: 'Éxito', detail: 'Datos actualizados correctamente.' };
-            case 'delete-success':
-                return { severity: 'success', summary: 'Éxito', detail: 'Datos eliminados correctamente.' };
-            case 'error-load':
-                return { severity: 'error', summary: 'Error', detail: 'Error al cargar datos. Intente nuevamente.' };
-            case 'error-save':
-                return { severity: 'error', summary: 'Error', detail: 'Error al guardar datos. Intente nuevamente.' };
-            case 'generic-error':
-                return { severity: 'error', summary: 'Error', detail: 'Error al realizar la operación. Intente nuevamente.' };
-                case 'load-success':
-                return { severity: 'success', summary: 'Éxito', detail: 'Datos cargados correctamente.' };
-            case 'select-option':
-                return { severity: 'warn', summary: 'Advertencia', detail: 'Seleccione al menos una opción.' };
-                case 'not-valid':
-                return { severity: 'error', summary: 'Error', detail: 'Datos no válidos o incompletos.' };
-            case 'matricula-existe':
-                return { severity: 'error', summary: 'Error', detail: 'La matrícula ya se encuentra registrada.' };
-            case 'bievenido':
-                return { severity: 'info', summary: 'Bienvenido', detail: 'Bienvenido a la plataforma.' };
-            case 'session-expired':
-                return { severity: 'warn', summary: 'Advertencia', detail: 'Su sesión ha expirado. Inicie sesión nuevamente.' };
-                
-            default:
-                return { severity: 'info', summary: 'Información', detail: 'Operación realizada.' };
-        }
-        }
+  constructor(private messageService: MessageService) {}
+
+  // Método genérico para mostrar un toast
+  private show(detail: string, severity: 'success' | 'error' | 'warn' | 'info', life = 5000) {
+    this.messageService.add({ severity, summary: this.getSummary(severity), detail, life });
+  }
+
+  // Devuelve el summary automáticamente según el severity
+  private getSummary(severity: 'success' | 'error' | 'warn' | 'info'): string {
+    switch (severity) {
+      case 'success': return 'Éxito';
+      case 'error': return 'Error';
+      case 'warn': return 'Advertencia';
+      case 'info': return 'Información';
     }
+  }
 
-    // Métodos públicos para cada tipo de mensaje
-    public error(key: string | number) {
-        const message = this.getMensaje(key);
-        this.messageService.add({ ...message, severity: 'error', life: 6000 });
-    }
+  // Resolución del mensaje según clave, código o mensaje custom
+  private resolveMessage(key: number | MessageKey | string): string {
+    if (typeof key === 'number') return this.messagesByCode[key] ?? key.toString();
+    if (typeof key === 'string') return this.messagesByKey[key as MessageKey] ?? key;
+    return String(key);
+  }
 
-    public info(key: string | number) {
-        const message = this.getMensaje(key);
-        this.messageService.add({ ...message, severity: 'info' });
-    }
+  // Métodos públicos
+  public success(key: number | MessageKey | string) {
+    this.show(this.resolveMessage(key), 'success');
+  }
 
-    public warning(key: string | number) {
-        const message = this.getMensaje(key);
-        this.messageService.add({ ...message, severity: 'warn' });
-    }
+  public error(key: number | MessageKey | string) {
+    this.show(this.resolveMessage(key), 'error', 6000);
+  }
 
-    public success(key: string | number) {
-        const message = this.getMensaje(key);
-        this.messageService.add({ ...message, severity: 'success' });
-    }
+  public warning(key: number | MessageKey | string) {
+    this.show(this.resolveMessage(key), 'warn');
+  }
+
+  public info(key: number | MessageKey | string) {
+    this.show(this.resolveMessage(key), 'info');
+  }
 }

@@ -3,7 +3,7 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { ToastService } from '../shared/services/toastService.service';
 
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
-  const toastService = inject(ToastService); // ✅ Inyectar el servicio de toast
+  const toastService = inject(ToastService); 
   const token = sessionStorage.getItem('token');
 
   if (token) {
@@ -11,10 +11,9 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
       setHeaders: { Token: `Bearer ${token}` }
     });
 
-    console.log('✅ Interceptor ejecutado, enviando token:', token); // Debug
     return next(authReq);
   }
+  toastService.error('No autenticado');
 
-  console.log('⚠️ No hay token, pasando la solicitud sin cambios.');
   return next(req);
 };

@@ -32,6 +32,13 @@ export class AppMenu {
                     { label: 'Autorizaciones', icon: 'pi pi-fw pi-check-square', routerLink: ['/pages/permiso/autorizaciones'] }
                 ]
             },
+            /*Nómina -----> Levantar nómina*/
+            {
+                label: 'Nómina',
+                items: [
+                    { label: 'Incidencias', icon: 'pi pi-fw pi-calendar-times', routerLink: ['/pages/nomina/incidencias'] }
+                ]
+            }
         ];
     }
 }

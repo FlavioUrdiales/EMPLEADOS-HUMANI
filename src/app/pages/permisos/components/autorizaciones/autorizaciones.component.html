@@ -36,37 +36,40 @@
                 <i class="pi pi-verified text-primary text-3xl"></i>
             </div>
             <div class="flex flex-col">
-                <h2 class="text-3xl font-extrabold text-primary dark:text-primary-300 tracking-tight">Autorización de
-                    Permisos</h2>
+                <h2 class="text-3xl font-extrabold text-primary dark:text-primary-300 tracking-tight">
+                    Autorización de Permisos
+                </h2>
                 <span class="text-sm text-gray-600 dark:text-gray-400">Lista de permisos pendientes por aprobar</span>
             </div>
         </div>
 
         <!-- Filtro -->
         <p-dropdown [options]="estados" [(ngModel)]="estadoSeleccionado" placeholder="Filtrar por estado"
-            styleClass="w-60 p-inputtext-sm rounded-xl shadow-md"></p-dropdown>
+            styleClass="w-full sm:w-60 p-inputtext-sm rounded-xl shadow-md"></p-dropdown>
     </div>
 
     <hr class="my-4 border-primary/30 dark:border-primary/50 rounded">
 
-    <!-- Tabla de Permisos -->
+    <!-- ====================== -->
+    <!-- Vista Escritorio/Tablet -->
+    <!-- ====================== -->
     <div
-        class="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        class="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden hidden sm:block">
         <p-table [value]="lstPermisos | filtroEstado: estadoSeleccionado" [paginator]="true" [rows]="10"
             responsiveLayout="scroll" dataKey="id" [rowHover]="true" class="text-sm">
 
             <!-- Header -->
             <ng-template pTemplate="header">
                 <tr class="bg-primary/10 dark:bg-primary/20 text-gray-800 dark:text-gray-100">
-                    <th pSortableColumn="nombre_colaborador" class="py-3 px-4 font-semibold">Colaborador
-                        <p-sortIcon field="nombre_colaborador"></p-sortIcon>
+                    <th pSortableColumn="nombre_colaborador" class="py-3 px-4 font-semibold">
+                        Colaborador <p-sortIcon field="nombre_colaborador"></p-sortIcon>
                     </th>
-                    <th pSortableColumn="departamento" class="py-3 px-4 font-semibold">Departamento
-                        <p-sortIcon field="departamento"></p-sortIcon>
+                    <th pSortableColumn="departamento" class="py-3 px-4 font-semibold">
+                        Departamento <p-sortIcon field="departamento"></p-sortIcon>
                     </th>
                     <th class="py-3 px-4 font-semibold">Tipo</th>
-                    <th pSortableColumn="fecha_inicio" class="py-3 px-4 font-semibold"> Fechas
-                        <p-sortIcon field="fecha_inicio"></p-sortIcon>
+                    <th pSortableColumn="fecha_inicio" class="py-3 px-4 font-semibold">
+                        Fechas <p-sortIcon field="fecha_inicio"></p-sortIcon>
                     </th>
                     <th class="py-3 px-4 font-semibold">Motivo</th>
                     <th class="py-3 px-4 font-semibold">Estado</th>
@@ -108,7 +111,6 @@
                                 </p>
                             </div>
                         </p-popover>
-
                     </td>
                     <td class="py-3 px-4">
                         <p-tag [value]="permiso.estado || 'pendiente'" [severity]="
@@ -116,14 +118,13 @@
                             class="rounded-xl px-2 py-1 text-xs font-bold"></p-tag>
                     </td>
                     <td class="py-3 px-4 flex gap-2">
-                        <button pButton icon="pi pi-check"
-                            class="p-button-rounded p-button-success p-button-sm shadow-md hover:scale-105 transition-transform"
+                        <p-button icon="pi pi-check" [text]="true" [raised]="true" title="Autorizar"
                             (click)="confirmarAccion('autorizar', permiso)"
-                            [disabled]="permiso.estado !== 'pendiente'"></button>
-                        <button pButton icon="pi pi-times"
-                            class="p-button-rounded p-button-danger p-button-sm shadow-md hover:scale-105 transition-transform"
+                            [disabled]="permiso.estado !== 'pendiente'" />
+                        <p-button icon="pi pi-times"  [text]="true" [raised]="true" severity="danger" title="Rechazar"
                             (click)="confirmarAccion('rechazar', permiso)"
-                            [disabled]="permiso.estado !== 'pendiente'"></button>
+                            [disabled]="permiso.estado !== 'pendiente'" />
+
                     </td>
                 </tr>
             </ng-template>
@@ -137,5 +138,52 @@
                 </tr>
             </ng-template>
         </p-table>
+    </div>
+
+    <!-- ============== -->
+    <!-- Vista Teléfono -->
+    <!-- ============== -->
+    <div class="sm:hidden space-y-4">
+        <div *ngFor="let permiso of (lstPermisos | filtroEstado: estadoSeleccionado)"
+            class="bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-4">
+
+            <!-- Encabezado -->
+            <div class="flex items-center gap-3">
+                <p-avatar [label]="permiso.nombre_colaborador[0]" shape="circle"
+                    class="bg-primary text-white font-bold"></p-avatar>
+                <div>
+                    <p class="font-semibold text-gray-800 dark:text-gray-100">{{ permiso.nombre_colaborador }}</p>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ permiso.departamento }}</span>
+                </div>
+            </div>
+
+            <!-- Tipo y Fecha -->
+            <div class="mt-2 flex flex-wrap gap-2 text-xs">
+                <p-tag severity="info" [value]="permiso.tipo_permiso" class="rounded-xl px-2 py-1"></p-tag>
+                <p-chip [label]="(permiso.fecha_inicio | date:'dd/MM/yyyy') || 'N/A'"
+                    styleClass="px-2 py-1 bg-primary/20 text-primary font-semibold rounded-lg"></p-chip>
+            </div>
+
+            <!-- Motivo -->
+            <div class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                {{ permiso.motivo_permiso || 'Sin motivo especificado' }}
+            </div>
+
+            <!-- Estado y Acciones -->
+            <div class="mt-3 flex justify-between items-center">
+                <p-tag [value]="permiso.estado || 'pendiente'" [severity]="
+          permiso.estado === 'autorizado' ? 'success' : permiso.estado === 'rechazado' ? 'danger' : 'warn'"
+                    class="rounded-xl px-2 py-1 text-xs font-bold"></p-tag>
+
+                <div class="flex gap-2">
+                        <p-button icon="pi pi-check"  [text]="true" [raised]="true" title="Autorizar"
+                            (click)="confirmarAccion('autorizar', permiso)"
+                            [disabled]="permiso.estado !== 'pendiente'" />
+                        <p-button icon="pi pi-times"  [text]="true" [raised]="true" severity="danger" title="Rechazar"
+                            (click)="confirmarAccion('rechazar', permiso)"
+                            [disabled]="permiso.estado !== 'pendiente'" />
+                </div>
+            </div>
+        </div>
     </div>
 </div>
