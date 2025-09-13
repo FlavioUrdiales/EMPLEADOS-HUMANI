@@ -29,6 +29,7 @@ export class AppMenu {
                 label: 'Permisos',
                 items: [
                     { label: 'Solicitud de Permiso', icon: 'pi pi-fw pi-file', routerLink: ['/pages/permiso/solicitud'] },
+                    { label: 'Autorizaciones', icon: 'pi pi-fw pi-check-square', routerLink: ['/pages/permiso/autorizaciones'] }
                 ]
             },
         ];

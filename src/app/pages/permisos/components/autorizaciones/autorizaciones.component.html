@@ -1,0 +1,141 @@
+<div class="mx-auto">
+
+    <!-- Toasts -->
+    <p-toast></p-toast>
+
+    <!-- Confirm Dialog -->
+    <p-confirmDialog #cd [style]="{ width: '90vw', maxWidth: '450px' }">
+        <ng-template #headless let-message let-onAccept="onAccept" let-onReject="onReject">
+            <div class="flex flex-col items-center p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-xl">
+                <div
+                    class="rounded-full bg-primary/10 text-primary inline-flex justify-center items-center h-20 w-20 -mt-16 shadow-md">
+                    <i class="pi pi-exclamation-circle !text-4xl"></i>
+                </div>
+                <h3 class="font-semibold text-2xl text-gray-800 dark:text-gray-100 mt-6 text-center">
+                    {{ message.header }}
+                </h3>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mt-2 text-center">
+                    {{ message.message }}
+                </p>
+                <div class="flex gap-4 mt-8">
+                    <p-button label="Confirmar" (onClick)="onAccept()"
+                        styleClass="w-32 p-button-success rounded-xl shadow-sm hover:scale-105 transition-transform"></p-button>
+                    <p-button label="Cancelar" [outlined]="true" (onClick)="onReject()"
+                        styleClass="w-32 p-button-secondary rounded-xl shadow-sm hover:scale-105 transition-transform"></p-button>
+                </div>
+            </div>
+        </ng-template>
+    </p-confirmDialog>
+
+    <!-- Header Moderno -->
+    <div
+        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-8 rounded-2xl bg-gradient-to-r from-primary/20 to-primary/10 shadow-md border border-primary/30">
+        <!-- Icono y Título -->
+        <div class="flex items-center gap-4">
+            <div class="bg-white dark:bg-gray-800 rounded-full p-5 shadow-lg flex items-center justify-center -mt-4">
+                <i class="pi pi-verified text-primary text-3xl"></i>
+            </div>
+            <div class="flex flex-col">
+                <h2 class="text-3xl font-extrabold text-primary dark:text-primary-300 tracking-tight">Autorización de
+                    Permisos</h2>
+                <span class="text-sm text-gray-600 dark:text-gray-400">Lista de permisos pendientes por aprobar</span>
+            </div>
+        </div>
+
+        <!-- Filtro -->
+        <p-dropdown [options]="estados" [(ngModel)]="estadoSeleccionado" placeholder="Filtrar por estado"
+            styleClass="w-60 p-inputtext-sm rounded-xl shadow-md"></p-dropdown>
+    </div>
+
+    <hr class="my-4 border-primary/30 dark:border-primary/50 rounded">
+
+    <!-- Tabla de Permisos -->
+    <div
+        class="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <p-table [value]="lstPermisos | filtroEstado: estadoSeleccionado" [paginator]="true" [rows]="10"
+            responsiveLayout="scroll" dataKey="id" [rowHover]="true" class="text-sm">
+
+            <!-- Header -->
+            <ng-template pTemplate="header">
+                <tr class="bg-primary/10 dark:bg-primary/20 text-gray-800 dark:text-gray-100">
+                    <th pSortableColumn="nombre_colaborador" class="py-3 px-4 font-semibold">Colaborador
+                        <p-sortIcon field="nombre_colaborador"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="departamento" class="py-3 px-4 font-semibold">Departamento
+                        <p-sortIcon field="departamento"></p-sortIcon>
+                    </th>
+                    <th class="py-3 px-4 font-semibold">Tipo</th>
+                    <th pSortableColumn="fecha_inicio" class="py-3 px-4 font-semibold"> Fechas
+                        <p-sortIcon field="fecha_inicio"></p-sortIcon>
+                    </th>
+                    <th class="py-3 px-4 font-semibold">Motivo</th>
+                    <th class="py-3 px-4 font-semibold">Estado</th>
+                    <th class="py-3 px-4 font-semibold">Acciones</th>
+                </tr>
+            </ng-template>
+
+            <!-- Body -->
+            <ng-template pTemplate="body" let-permiso>
+                <tr class="hover:bg-primary/5 transition-colors">
+                    <td class="py-3 px-4 flex items-center gap-2">
+                        <p-avatar [label]="permiso.nombre_colaborador[0]" shape="circle"
+                            class="bg-primary text-white font-bold"></p-avatar>
+                        <span class="font-medium">{{ permiso.nombre_colaborador }}</span>
+                    </td>
+                    <td class="py-3 px-4">{{ permiso.departamento }}</td>
+                    <td class="py-3 px-4">
+                        <p-tag severity="info" [value]="permiso.tipo_permiso"
+                            class="rounded-xl text-xs font-medium px-2 py-1"></p-tag>
+                    </td>
+                    <td class="py-3 px-4 flex flex-wrap gap-1">
+                        <p-chip [label]="(permiso.fecha_inicio | date:'dd/MM/yyyy') || 'N/A'"
+                            styleClass="px-2 py-1 bg-primary/20 text-primary font-semibold rounded-lg text-xs"></p-chip>
+                    </td>
+                    <td class="py-3 px-4">
+                        <button pButton icon="pi pi-eye"
+                            class="p-button-text p-button-sm text-primary hover:bg-primary/10 rounded-lg"
+                            (click)="op.toggle($event)"></button>
+                        <p-popover #op>
+                            <div
+                                class="w-64 p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="pi pi-info-circle text-primary text-lg"></i>
+                                    <span class="font-semibold text-gray-900 dark:text-gray-100 text-sm">Motivo del
+                                        permiso</span>
+                                </div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                                    {{ permiso.motivo_permiso || 'Sin motivo especificado' }}
+                                </p>
+                            </div>
+                        </p-popover>
+
+                    </td>
+                    <td class="py-3 px-4">
+                        <p-tag [value]="permiso.estado || 'pendiente'" [severity]="
+              permiso.estado === 'autorizado' ? 'success' : permiso.estado === 'rechazado' ? 'danger' : 'warn'"
+                            class="rounded-xl px-2 py-1 text-xs font-bold"></p-tag>
+                    </td>
+                    <td class="py-3 px-4 flex gap-2">
+                        <button pButton icon="pi pi-check"
+                            class="p-button-rounded p-button-success p-button-sm shadow-md hover:scale-105 transition-transform"
+                            (click)="confirmarAccion('autorizar', permiso)"
+                            [disabled]="permiso.estado !== 'pendiente'"></button>
+                        <button pButton icon="pi pi-times"
+                            class="p-button-rounded p-button-danger p-button-sm shadow-md hover:scale-105 transition-transform"
+                            (click)="confirmarAccion('rechazar', permiso)"
+                            [disabled]="permiso.estado !== 'pendiente'"></button>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <!-- Empty -->
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="7" class="text-center py-6 text-gray-500 dark:text-gray-400">
+                        No hay permisos disponibles
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>

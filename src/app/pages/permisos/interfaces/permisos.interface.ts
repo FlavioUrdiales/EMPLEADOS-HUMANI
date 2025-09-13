@@ -18,7 +18,7 @@ export interface Permisos {
 }
 
 export interface PermisosResponse {
-    success: boolean;
+    success: string;
     message: string;
     data: Permisos[];
 }
