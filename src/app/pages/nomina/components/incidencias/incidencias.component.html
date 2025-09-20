@@ -2,213 +2,327 @@
   <p-toast></p-toast>
 
   <!-- Selector de rango de fechas -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 rounded-2xl 
-              bg-gradient-to-r from-blue-100 to-blue-50 shadow-md border border-blue-200 mb-6">
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 rounded-2xl 
+           bg-gradient-to-r from-primary-100 to-primary-50 shadow-md border border-primary-200 mb-6
+           dark:from-gray-800 dark:to-gray-900 dark:border-gray-700">
     <div class="flex items-center gap-4">
-      <div class="bg-white rounded-full p-4 shadow-lg flex items-center justify-center -mt-4">
-        <i class="pi pi-calendar text-3xl text-blue-500"></i>
+      <div
+        class="bg-white dark:bg-gray-700 rounded-full p-4 shadow-lg flex items-center justify-center -mt-4">
+        <i class="pi pi-calendar text-3xl text-primary-500"></i>
       </div>
       <div class="flex flex-col">
-        <h2 class="text-3xl font-extrabold text-blue-700 tracking-tight">
+        <h2
+          class="text-3xl font-extrabold text-primary-700 tracking-tight dark:text-primary-300">
           Control de Nómina
         </h2>
-        <span class="text-sm text-gray-600">Resumen de días trabajados, incidencias y permisos</span>
+        <span class="text-sm text-gray-600 dark:text-gray-400">
+          Resumen de días trabajados, incidencias y permisos
+        </span>
       </div>
     </div>
 
-    <p-datepicker [(ngModel)]="rangoFechas" selectionMode="range" dateFormat="yy-mm-dd"
-      (onSelect)="onRangoFechasChange($event)" [showIcon]="true" placeholder="Selecciona un rango de fechas"
-      class="w-full sm:w-64"></p-datepicker>
+    <p-datepicker
+      [(ngModel)]="rangoFechas"
+      selectionMode="range"
+      dateFormat="yy-mm-dd"
+      (onSelect)="onRangoFechasChange($event)"
+      [showIcon]="true"
+      placeholder="Selecciona un rango de fechas"
+      class="w-full sm:w-64"
+    ></p-datepicker>
+
+    <button
+      pButton
+      label="Generar Nómina Quincenal"
+      icon="pi pi-cog"
+      class="p-button-rounded p-button-warning"
+      (click)="generarNominaQuincenal()"
+      [disabled]="!rangoFechas || rangoFechas.length !== 2"
+    ></button>
   </div>
 
-  <!-- Tarjetas de resumen -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6" *ngIf="resumenNomina.length > 0">
-    <div class="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
+  <!-- Tarjetas de resumen 
+  <div
+    class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"
+    *ngIf="resumenNomina.length > 0"
+  >
+    <div
+      class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border-l-4 border-blue-500"
+    >
       <div class="flex items-center">
         <i class="pi pi-calendar-plus text-blue-500 text-xl mr-3"></i>
         <div>
-          <p class="text-sm text-gray-600">Días con turno</p>
-          <p class="text-2xl font-bold">{{ getTotalDiasConTurno() }}</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Días con turno</p>
+          <p class="text-2xl font-bold dark:text-white">
+            {{ getTotalDiasConTurno() }}
+          </p>
         </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border-l-4 border-green-500"
+    >
       <div class="flex items-center">
         <i class="pi pi-check-circle text-green-500 text-xl mr-3"></i>
         <div>
-          <p class="text-sm text-gray-600">Días trabajados</p>
-          <p class="text-2xl font-bold">{{ getTotalDiasTrabajados() }}</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Días trabajados
+          </p>
+          <p class="text-2xl font-bold dark:text-white">
+            {{ getTotalDiasTrabajados() }}
+          </p>
         </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-4 border-l-4 border-red-500">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border-l-4 border-red-500"
+    >
       <div class="flex items-center">
         <i class="pi pi-exclamation-triangle text-red-500 text-xl mr-3"></i>
         <div>
-          <p class="text-sm text-gray-600">Días con incidencias</p>
-          <p class="text-2xl font-bold">{{ getTotalDiasConIncidencias() }}</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Días con incidencias
+          </p>
+          <p class="text-2xl font-bold dark:text-white">
+            {{ getTotalDiasConIncidencias() }}
+          </p>
         </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-4 border-l-4 border-purple-500">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border-l-4 border-purple-500"
+    >
       <div class="flex items-center">
         <i class="pi pi-file-edit text-purple-500 text-xl mr-3"></i>
         <div>
-          <p class="text-sm text-gray-600">Permisos otorgados</p>
-          <p class="text-2xl font-bold">{{ getTotalPermisos() }}</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Permisos otorgados
+          </p>
+          <p class="text-2xl font-bold dark:text-white">
+            {{ getTotalPermisos() }}
+          </p>
         </div>
       </div>
     </div>
-  </div>
+  </div>-->
 
   <!-- Tabla de resumen de nómina -->
-  <p-table [value]="resumenNomina" [paginator]="true" [rows]="10" #dt [responsiveLayout]="'scroll'"
-    class="shadow-md rounded-2xl overflow-hidden mb-6">
-
+  <p-table
+    [value]="resumenNomina"
+    [paginator]="true"
+    [rows]="10"
+    #dt
+    [responsiveLayout]="'scroll'"
+    class="shadow-md rounded-2xl overflow-hidden mb-6"
+  >
     <!-- Encabezado -->
     <ng-template pTemplate="header">
       <tr>
-        <th pSortableColumn="usuario" class="bg-blue-50">
+        <th
+          pSortableColumn="usuario"
+          class="bg-blue-50 dark:bg-gray-700 dark:text-gray-200"
+        >
           Usuario <p-sortIcon field="usuario"></p-sortIcon>
         </th>
-        <th class="bg-blue-50">Días con turno</th>
-        <th class="bg-blue-50">Días trabajados</th>
-        <th class="bg-blue-50">Días con incidencias</th>
-        <th class="bg-blue-50">Total incidencias</th>
-        <th class="bg-blue-50">Permisos</th>
+        <th class="bg-blue-50 dark:bg-gray-700 dark:text-gray-200">
+          Días con turno
+        </th>
+        <th class="bg-blue-50 dark:bg-gray-700 dark:text-gray-200">
+          Días trabajados
+        </th>
+        <th class="bg-blue-50 dark:bg-gray-700 dark:text-gray-200">
+          Días con incidencias
+        </th>
+        <th class="bg-blue-50 dark:bg-gray-700 dark:text-gray-200">
+          Total incidencias
+        </th>
+        <th class="bg-blue-50 dark:bg-gray-700 dark:text-gray-200">Permisos</th>
         <ng-container *ngFor="let codigo of Object.values(codigosIncidencias)">
-          <th class="bg-blue-50" *ngIf="codigo !== 'NO_TUR' && codigo !== 'PERM'">
+          <th
+            class="bg-blue-50 dark:bg-gray-700 dark:text-gray-200"
+            *ngIf="codigo !== 'NO_TUR' && codigo !== 'PERM'"
+          >
             {{ obtenerDescripcionPorCodigo(codigo) }}
           </th>
         </ng-container>
       </tr>
     </ng-template>
 
+    <!-- Body -->
     <ng-template pTemplate="body" let-usuarioResumen>
-      <tr>
+      <tr class="dark:text-gray-200 dark:hover:bg-gray-800">
         <td class="font-semibold">{{ usuarioResumen.usuario }}</td>
         <td>{{ usuarioResumen.diasConTurno }}</td>
         <td>{{ usuarioResumen.diasTrabajados }}</td>
         <td>
-          <span class="badge" [ngClass]="{
-        'badge-danger': usuarioResumen.diasConIncidencias > 0,
-        'badge-success': usuarioResumen.diasConIncidencias === 0
-      }">
+          <span
+            class="badge"
+            [ngClass]="{
+              'badge-danger': usuarioResumen.diasConIncidencias > 0,
+              'badge-success': usuarioResumen.diasConIncidencias === 0
+            }"
+          >
             {{ usuarioResumen.diasConIncidencias }}
           </span>
         </td>
         <td>
-          <span class="badge" [ngClass]="{
-        'badge-danger': usuarioResumen.totalIncidencias > 0,
-        'badge-success': usuarioResumen.totalIncidencias === 0
-      }">
+          <span
+            class="badge"
+            [ngClass]="{
+              'badge-danger': usuarioResumen.totalIncidencias > 0,
+              'badge-success': usuarioResumen.totalIncidencias === 0
+            }"
+          >
             {{ usuarioResumen.totalIncidencias }}
           </span>
         </td>
 
-        <!-- Columna de Permisos -->
+        <!-- Columna permisos -->
         <td>
-          <span *ngIf="usuarioResumen.permisos.count > 0"
-            class="cursor-pointer inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold border bg-blue-50 text-blue-700 border-blue-300"
-            (click)="popoverPermisos.toggle($event)">
+          <span
+            *ngIf="usuarioResumen.permisos.count > 0"
+            class="cursor-pointer inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold border 
+                   bg-blue-50 text-blue-700 border-blue-300 
+                   dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700"
+            (click)="popoverPermisos.toggle($event)"
+          >
             <i class="pi pi-id-card mr-1"></i>
             {{ usuarioResumen.permisos.count }}
           </span>
-          <span *ngIf="usuarioResumen.permisos.count === 0" class="text-gray-400">–</span>
+          <span
+            *ngIf="usuarioResumen.permisos.count === 0"
+            class="text-gray-400 dark:text-gray-600"
+            >–</span
+          >
 
-  <p-popover #popoverPermisos styleClass="max-w-sm shadow-lg rounded-lg">
-    <div class="p-4 text-sm max-h-64 overflow-y-auto">
-      <!-- Header -->
-      <div class="flex items-center gap-2 mb-3 border-b pb-2">
-        <i class="pi pi-id-card text-blue-500 text-lg"></i>
-        <h5 class="font-semibold text-gray-700">Permisos otorgados</h5>
-      </div>
+          <!-- Popover permisos -->
+          <p-popover #popoverPermisos styleClass="max-w-sm shadow-lg rounded-lg">
+            <div
+              class="p-4 text-sm max-h-64 overflow-y-auto bg-white dark:bg-gray-800 dark:text-gray-200"
+            >
+              <!-- Header -->
+              <div class="flex items-center gap-2 mb-3 border-b pb-2 dark:border-gray-600">
+                <i class="pi pi-id-card text-blue-500 text-lg"></i>
+                <h5 class="font-semibold text-gray-700 dark:text-gray-200">
+                  Permisos otorgados
+                </h5>
+              </div>
 
-      <!-- Resumen global de permisos -->
-      <div class="flex items-center gap-2 mb-3 text-xs text-blue-700 font-semibold">
-        <i class="pi pi-check-circle text-blue-500"></i>
-        Total: {{ usuarioResumen.permisos.count }}
-      </div>
+              <!-- Resumen global -->
+              <div
+                class="flex items-center gap-2 mb-3 text-xs text-blue-700 font-semibold dark:text-blue-300"
+              >
+                <i class="pi pi-check-circle text-blue-500"></i>
+                Total: {{ usuarioResumen.permisos.count }}
+              </div>
 
-      <!-- Listado de permisos -->
-      <ul class="list-disc list-inside space-y-1 text-gray-700">
-        <li *ngFor="let detalle of usuarioResumen.permisos.detalles"
-            class="p-2 rounded hover:bg-blue-50 transition flex items-start gap-2">
-          <i class="pi pi-calendar mt-0.5 text-gray-400"></i>
-          <span class="text-gray-700 text-sm">{{ detalle }}</span>
-        </li>
-      </ul>
-    </div>
-  </p-popover>
+              <!-- Listado -->
+              <ul
+                class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300"
+              >
+                <li
+                  *ngFor="let detalle of usuarioResumen.permisos.detalles"
+                  class="p-2 rounded hover:bg-blue-50 dark:hover:bg-gray-700 transition flex items-start gap-2"
+                >
+                  <i class="pi pi-calendar mt-0.5 text-gray-400"></i>
+                  <span class="text-sm">{{ detalle }}</span>
+                </li>
+              </ul>
+            </div>
+          </p-popover>
         </td>
 
-        <!-- Columnas dinámicas de incidencias -->
+        <!-- Columnas dinámicas incidencias -->
         <ng-container *ngFor="let codigo of Object.values(codigosIncidencias)">
           <td *ngIf="codigo !== 'NO_TUR' && codigo !== 'PERM'">
-            <ng-container *ngIf="usuarioResumen.incidencias[codigo]?.count > 0; else sinIncidencia">
-
-              <!-- Badge con resumen -->
-              <span class="cursor-pointer inline-flex items-center rounded-lg px-2 py-1 text-xs font-semibold border"
+            <ng-container
+              *ngIf="usuarioResumen.incidencias[codigo]?.count > 0; else sinIncidencia"
+            >
+              <span
+                class="cursor-pointer inline-flex items-center rounded-lg px-2 py-1 text-xs font-semibold border 
+                       dark:border-gray-600 dark:text-gray-200"
                 (click)="popoverIncidencia.toggle($event)"
-                [ngClass]="getColorIncidencia(usuarioResumen.incidencias[codigo].detalles)">
-                <i class="pi pi-list mr-1"></i>
+                [ngClass]="getColorIncidencia(usuarioResumen.incidencias[codigo].detalles)"
+              >
+                <i class="pi pi-list mr-1 dark:text-gray-200"
+                ></i>
                 {{ usuarioResumen.incidencias[codigo].count }}
 
-                <span class="ml-1 text-green-600" *ngIf="isCubierta(usuarioResumen.incidencias[codigo].detalles)">
+                <span
+                  class="ml-1 text-green-600 dark:text-green-400"
+                  *ngIf="isCubierta(usuarioResumen.incidencias[codigo].detalles)"
+                >
                   ({{ getCountCubiertas(usuarioResumen.incidencias[codigo].detalles) }}✔)
                 </span>
 
-                <span class="ml-1 text-red-600" *ngIf="isNoCubierta(usuarioResumen.incidencias[codigo].detalles)">
+                <span
+                  class="ml-1 text-red-600 dark:text-red-400"
+                  *ngIf="isNoCubierta(usuarioResumen.incidencias[codigo].detalles)"
+                >
                   ({{ getCountNoCubiertas(usuarioResumen.incidencias[codigo].detalles) }}✘)
                 </span>
-
               </span>
 
-
-
-              <!-- Popover -->
+              <!-- Popover incidencias -->
               <p-popover #popoverIncidencia styleClass="max-w-xs">
-                <div class="p-3 text-sm max-h-64 overflow-y-auto">
-                  <div class="flex items-center gap-2 mb-2 border-b pb-1">
+                <div
+                  class="p-3 text-sm max-h-64 overflow-y-auto bg-white dark:bg-gray-800 dark:text-gray-200"
+                >
+                  <div
+                    class="flex items-center gap-2 mb-2 border-b pb-1 dark:border-gray-600"
+                  >
                     <i class="pi pi-info-circle text-blue-500"></i>
-                    <h5 class="font-semibold text-gray-700">
+                    <h5 class="font-semibold text-gray-700 dark:text-gray-200">
                       Detalles de {{ obtenerDescripcionPorCodigo(codigo) }}
                     </h5>
                   </div>
 
-                  <!-- Resumen global -->
+                  <!-- Resumen -->
                   <div class="flex gap-4 mb-3 text-xs">
-                    <span class="ml-1 text-green-600" *ngIf="isCubierta(usuarioResumen.incidencias[codigo].detalles)">
+                    <span
+                      class="ml-1 text-green-600"
+                      *ngIf="isCubierta(usuarioResumen.incidencias[codigo].detalles)"
+                    >
                       ({{ getCountCubiertas(usuarioResumen.incidencias[codigo].detalles) }}✔)
                     </span>
 
-                    <span class="ml-1 text-red-600" *ngIf="isNoCubierta(usuarioResumen.incidencias[codigo].detalles)">
+                    <span
+                      class="ml-1 text-red-600"
+                      *ngIf="isNoCubierta(usuarioResumen.incidencias[codigo].detalles)"
+                    >
                       ({{ getCountNoCubiertas(usuarioResumen.incidencias[codigo].detalles) }}✘)
                     </span>
-
                   </div>
 
-                  <!-- Listado de incidencias -->
-                  <div *ngFor="let inc of usuarioResumen.incidencias[codigo].detalles"
-                    class="mb-2 pb-2 border-b last:border-none">
-                    <p class="text-gray-700">
+                  <!-- Lista -->
+                  <div
+                    *ngFor="let inc of usuarioResumen.incidencias[codigo].detalles"
+                    class="mb-2 pb-2 border-b last:border-none dark:border-gray-600"
+                  >
+                    <p class="text-gray-700 dark:text-gray-300">
                       <i class="pi pi-calendar mr-1 text-gray-500"></i>
                       <strong>Fecha:</strong> {{ inc.fecha }}
                     </p>
-                    <p class="text-gray-700">
+                    <p class="text-gray-700 dark:text-gray-300">
                       <i class="pi pi-align-left mr-1 text-gray-500"></i>
                       <strong>Descripción:</strong> {{ inc.descripcion }}
                     </p>
                     <p>
-                      <i class="pi pi-shield mr-1" [ngClass]="inc.cubierta ? 'text-green-600' : 'text-red-600'"></i>
+                      <i
+                        class="pi pi-shield mr-1"
+                        [ngClass]="inc.cubierta ? 'text-green-600' : 'text-red-600'"
+                      ></i>
                       <strong>Estado:</strong>
-                      <span [ngClass]="{
-                'text-green-600 font-semibold': inc.cubierta,
-                'text-red-600 font-semibold': !inc.cubierta
-              }">
+                      <span
+                        [ngClass]="{
+                          'text-green-600 font-semibold': inc.cubierta,
+                          'text-red-600 font-semibold': !inc.cubierta
+                        }"
+                      >
                         {{ inc.cubierta ? 'Cubierta por permiso' : 'No cubierta' }}
                       </span>
                     </p>
@@ -218,25 +332,23 @@
             </ng-container>
 
             <ng-template #sinIncidencia>
-              <span class="text-gray-400">–</span>
+              <span class="text-gray-400 dark:text-gray-600">–</span>
             </ng-template>
           </td>
         </ng-container>
-
-
       </tr>
     </ng-template>
-
 
     <!-- Mensaje vacío -->
     <ng-template pTemplate="emptymessage">
       <tr>
         <td [attr.colspan]="getColspan()" class="text-center p-5">
-          <i class="pi pi-search text-3xl text-gray-400 mb-3"></i>
-          <p class="text-gray-500">No hay registros para este rango de fechas</p>
+          <i class="pi pi-search text-3xl text-gray-400 dark:text-gray-600 mb-3"></i>
+          <p class="text-gray-500 dark:text-gray-400">
+            No hay registros para este rango de fechas
+          </p>
         </td>
       </tr>
     </ng-template>
-
   </p-table>
 </div>

@@ -38,7 +38,15 @@ export class AppMenu {
                 items: [
                     { label: 'Incidencias', icon: 'pi pi-fw pi-calendar-times', routerLink: ['/pages/nomina/incidencias'] }
                 ]
-            }
+            },
+
+            /*Usuarios -----> Levantar usuarios*/
+            {
+                label: 'Usuarios',
+                items: [
+                    { label: 'Relación de Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/pages/usuarios/usuarios'] }
+                ]
+            },
         ];
     }
 }

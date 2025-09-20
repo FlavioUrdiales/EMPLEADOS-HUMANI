@@ -21,6 +21,7 @@ interface DetalleIncidencia {
 }
 
 interface UsuarioResumen {
+  clave_usuario: string;
   usuario: string;
   diasConTurno: number;
   diasTrabajados: number;
@@ -63,7 +64,6 @@ export class IncidenciasComponent implements OnInit {
   public registrosAsistencia: RegistroAsistencia[] = [];
   public rangoFechas: Date[] = [];
   public resumenNomina: UsuarioResumen[] = [];
-
   // Incidencias fijas
   public codigosIncidencias: Record<string, string> = {
     'Retardo en entrada': 'RET_ENT',
@@ -200,6 +200,7 @@ export class IncidenciasComponent implements OnInit {
 
         mapa[user] = {
           usuario: user,
+          clave_usuario: r.clave_usuario,
           diasConTurno: 0,
           diasTrabajados: 0,
           diasConIncidencias: 0,
@@ -328,13 +329,13 @@ export class IncidenciasComponent implements OnInit {
     return `Total: ${detalles.length}\nCubiertas: ${cubiertas}\nNo cubiertas: ${noCubiertas}`;
   }
   getColorIncidencia(detalles: any[]): string {
-    if (!detalles || detalles.length === 0) return 'bg-gray-50 text-gray-400 border-gray-300';
+    if (!detalles || detalles.length === 0) return 'bg-gray-50 text-gray-400 border-gray-300 dark:bg-gray-800 dark:text-gray-500 dark:border-gray-600';
     const todasCubiertas = detalles.every(d => d.cubierta);
     const todasNoCubiertas = detalles.every(d => !d.cubierta);
 
-    if (todasCubiertas) return 'bg-green-50 text-green-700 border-green-300';
-    if (todasNoCubiertas) return 'bg-red-50 text-red-700 border-red-300';
-    return 'bg-yellow-50 text-yellow-700 border-yellow-300'; // mezcla
+    if (todasCubiertas) return 'bg-green-50 text-green-700 border-green-300 dark:bg-green-900 dark:text-green-300 dark:border-green-700';
+    if (todasNoCubiertas) return 'bg-red-50 text-red-700 border-red-300 dark:bg-red-900 dark:text-red-300 dark:border-red-700';
+    return 'bg-yellow-50 text-yellow-700 border-yellow-300 dark:bg-yellow-900 dark:text-yellow-300 dark:border-yellow-700';
   }
   // Devuelve true si alguna incidencia está cubierta
   isCubierta(detalles: any[]): boolean {
@@ -354,5 +355,39 @@ export class IncidenciasComponent implements OnInit {
   getCountNoCubiertas(detalles: any[]): number {
     return detalles?.filter(d => !d.cubierta).length ?? 0;
   }
+
+  // Generar nómina quincenal
+  public generarNominaQuincenal() {
+    let mes = this.rangoFechas[0].getMonth() + 1;
+    let anio = this.rangoFechas[0].getFullYear();
+    let diasTrabajadosPorEmpleado: Record<string, number> = this.resumenNomina.reduce((acc: { [key: string]: number }, usuario) => {
+      acc[usuario.clave_usuario] = usuario.diasConTurno;
+      return acc;
+    }, {} as { [key: string]: number });
+
+    let incidenciasPorEmpleado: Record<string, any[]> = this.resumenNomina.reduce((acc: { [key: string]: any[] }, usuario) => {
+      acc[usuario.clave_usuario] = Object.entries(usuario.incidencias).map(([codigo, info]) => ({
+        codigo,
+        descripcion: info.descripcion,
+        count: info.count,
+        cubierta: info.cubierta,
+        detalles: info.detalles
+      }));
+      return acc;
+    }, {} as { [key: string]: any[] });
+
+    let bonosPorEmpleado: Record<string, any[]> = {};
+    let cargosPorEmpleado: Record<string, any[]> = {};
+    let retencionesPorEmpleado: Record<string, any[]> = {};
+    let rangoFechas = this.rangoFechas.map(d => d.toISOString().split('T')[0]);
+    this.nominaService.generarNominaQuincenal(mes, anio, diasTrabajadosPorEmpleado, incidenciasPorEmpleado, rangoFechas, bonosPorEmpleado, cargosPorEmpleado, retencionesPorEmpleado).subscribe({
+
+      next: (data) => {
+        console.log('Nómina generada:', data);
+      },
+      error: (err) => console.error('Error al generar nómina:', err)
+    });
+  }
+    
 
 }

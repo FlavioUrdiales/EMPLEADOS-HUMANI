@@ -21,4 +21,13 @@ export class NominaService {
       return of([]);
     }));
   }
+
+
+
+  public generarNominaQuincenal(mes: number, anio: number,diasTrabajadosPorEmpleado: any,incidenciasPorEmpleado: any,rangoFechas: any,bonosPorEmpleado: any = [],cargosPorEmpleado: any = [],retencionesPorEmpleado: any = []): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}generarNominaQuincenal`, {mes,anio,diasTrabajadosPorEmpleado,incidenciasPorEmpleado,rangoFechas,bonosPorEmpleado,cargosPorEmpleado,retencionesPorEmpleado}).pipe(catchError((err) => {
+      this.toastService.error(err.status);
+      return of(null);
+    }));
+  }
 }

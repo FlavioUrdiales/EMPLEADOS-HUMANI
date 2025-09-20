@@ -12,5 +12,10 @@ export default [
         data: { title: 'Nómina', permisos: ['superAdmin', 'ADMIN', 'NOMINA'] },
         canActivate: [PermisoGuard]
     },
+    {
+        path: 'usuarios', loadChildren: () => import('./usuarios/usuarios.routes').then(m => m.default),
+        data: { title: 'Usuarios', permisos: ['superAdmin', 'ADMIN', 'USUARIOS'] },
+        canActivate: [PermisoGuard]
+    },
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;
