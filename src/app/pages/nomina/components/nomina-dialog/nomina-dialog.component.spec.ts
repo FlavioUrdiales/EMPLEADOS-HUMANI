@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NominaComponent } from './nomina.component';
+import { NominaDialogComponent } from './nomina-dialog.component';
 
-describe('NominaComponent', () => {
-  let component: NominaComponent;
-  let fixture: ComponentFixture<NominaComponent>;
+describe('NominaDialogComponent', () => {
+  let component: NominaDialogComponent;
+  let fixture: ComponentFixture<NominaDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NominaComponent]
+      imports: [NominaDialogComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(NominaComponent);
+    fixture = TestBed.createComponent(NominaDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

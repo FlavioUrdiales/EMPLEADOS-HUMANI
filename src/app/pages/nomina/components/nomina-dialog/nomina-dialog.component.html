@@ -1,0 +1,217 @@
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '95vw', maxWidth: '1200px' }" [closable]="false"
+    (onHide)="cerrarDialog()" contentClass="dark:bg-gray-900 bg-white rounded-2xl shadow-xl"
+    headerClass="bg-primary-600 text-white dark:bg-primary-700 rounded-t-2xl px-6 py-4">
+
+  <!-- Header -->
+  <div class="flex items-center gap-3">
+    <i class="pi pi-wallet text-2xl"></i>
+    <div>
+      <h2 class="text-lg font-semibold">Detalle de Nómina</h2>
+      <p class="text-xs text-gray-600">Consulta, edita y finaliza la nómina quincenal</p>
+    </div>
+  </div>
+
+  <!-- Vista selector -->
+  <div class="flex justify-between items-center mb-6 mt-4">
+    <div class="flex gap-3 items-center">
+      <button pButton
+        [label]="viewMode === 'todos' ? 'Vista por empleado' : 'Vista todos'"
+        [icon]="viewMode === 'todos' ? 'pi pi-user' : 'pi pi-users'"
+        class="p-button-sm bg-primary-600 hover:bg-primary-700 text-white rounded-lg px-3 py-1"
+        (click)="viewMode = viewMode === 'todos' ? 'individual' : 'todos'">
+      </button>
+
+      <p-select *ngIf="viewMode === 'individual'" [options]="nominas" [(ngModel)]="selectedNomina" appendTo="body"
+        optionLabel="nombre_empleado" placeholder="Selecciona empleado"
+        class="w-64 dark:bg-gray-800 dark:text-white">
+      </p-select>
+    </div>
+  </div>
+
+  <!-- VISTA TODOS -->
+  <div *ngIf="viewMode === 'todos'">
+<p-table [value]="nominas" responsiveLayout="scroll"
+  class="p-datatable-sm dark:bg-gray-800 dark:text-gray-200 rounded-xl shadow border border-gray-200 dark:border-gray-700"
+  [scrollable]="true" scrollHeight="400px">
+
+  <ng-template pTemplate="header">
+    <tr class="bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-200 text-sm">
+      <th><i class="pi pi-user mr-1"></i> Empleado</th>
+      <th><i class="pi pi-dollar mr-1"></i> Sueldo Diario</th>
+      <th><i class="pi pi-gift mr-1 text-green-600"></i> Bonos</th>
+      <th><i class="pi pi-exclamation-triangle mr-1 text-yellow-500"></i> Cargos</th>
+      <th><i class="pi pi-percentage mr-1 text-red-500"></i> Retenciones</th>
+      <th><i class="pi pi-chart-line mr-1 text-blue-500"></i> Fiscal</th>
+      <th><i class="pi pi-chart-line mr-1 text-purple-500"></i> No Fiscal</th>
+      <th><i class="pi pi-wallet mr-1 text-green-600"></i> Neto</th>
+      <th><i class="pi pi-flag mr-1"></i> Estatus</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-row>
+    <tr class="hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors text-sm">
+      <td>
+        <strong>{{ row.nombre_empleado }}</strong> <br/>
+        <small class="text-gray-500">{{ row.chrClave }} | {{ row.dias_trabajados }} días</small>
+      </td>
+      <td class="text-right">{{ row.sueldo_diario_real | currency:'MXN' }}</td>
+      <td class="text-green-600 font-semibold">
+        <input pInputText type="number" [(ngModel)]="row.bonos"
+          class="w-20 rounded-md dark:bg-gray-700 dark:text-white text-center" />
+      </td>
+      <td class="text-yellow-600">
+        <input pInputText type="number" [(ngModel)]="row.cargos_fiscal"
+          class="w-20 rounded-md dark:bg-gray-700 dark:text-white text-center" placeholder="F"/>
+        <input pInputText type="number" [(ngModel)]="row.cargos_no_fiscal"
+          class="w-20 rounded-md dark:bg-gray-700 dark:text-white text-center" placeholder="NF"/>
+      </td>
+      <td class="text-red-600 font-medium">{{ retencionesTotales(row) | currency:'MXN' }}</td>
+      <td class="text-blue-600 font-semibold">{{ calcularFiscal(row) | currency:'MXN' }}</td>
+      <td class="text-purple-600 font-semibold">{{ calcularNoFiscal(row) | currency:'MXN' }}</td>
+      <td class="text-green-700 font-bold">{{ calcularTotalNeto(row) | currency:'MXN':'symbol':'1.0-2' }}</td>
+      <td class="text-center">
+        <i class="pi text-lg"
+          [ngClass]="{
+            'pi-clock text-yellow-500': row.estatus==='Pendiente',
+            'pi-check-circle text-green-500': row.estatus==='Finalizada',
+            'pi-times-circle text-red-500': row.estatus==='Cancelada'
+          }"
+          pTooltip="{{ row.estatus }}" tooltipPosition="top"></i>
+      </td>
+    </tr>
+  </ng-template>
+
+  <!-- Totales -->
+  <ng-template pTemplate="footer">
+    <tr class="bg-primary-200 dark:bg-primary-800 font-semibold text-sm text-primary-900 dark:text-primary-200">
+      <td class="text-right pr-2"><i class="pi pi-sigma mr-1"></i> Totales:</td>
+      <td></td>
+      <td class="text-green-600">{{ total('bonos') | currency:'MXN' }}</td>
+      <td class="text-yellow-600">{{ total('cargos_fiscal') | currency:'MXN' }} / {{ total('cargos_no_fiscal') | currency:'MXN' }}</td>
+      <td class="text-red-600">{{ retencionesTotales() | currency:'MXN' }}</td>
+      <td class="text-blue-600">{{ totalFiscalTodos | currency:'MXN' }}</td>
+      <td class="text-purple-600">{{ totalNoFiscalTodos | currency:'MXN' }}</td>
+      <td class="text-green-700 font-bold">{{ totalNetoTodos() | currency:'MXN' }}</td>
+      <td></td>
+    </tr>
+  </ng-template>
+</p-table>
+
+  </div>
+
+  <!-- VISTA INDIVIDUAL -->
+  <div *ngIf="viewMode==='individual' && selectedNomina" class="space-y-6">
+
+    <!-- Card empleado -->
+    <div class="p-4 rounded-xl border bg-gray-50 dark:bg-gray-800 dark:border-gray-700 shadow-sm">
+      <h3 class="font-semibold mb-3 text-lg flex items-center gap-2 text-primary-700 dark:text-primary-300">
+        <i class="pi pi-id-card"></i> Información del empleado
+      </h3>
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div><strong>Empleado:</strong> {{ selectedNomina?.nombre_empleado }}</div>
+        <div><strong>Clave:</strong> {{ selectedNomina?.chrClave }}</div>
+        <div><strong>Quincena:</strong> {{ selectedNomina?.quincena }}/{{ selectedNomina?.mes }}/{{ selectedNomina?.anio }}</div>
+        <div>
+          <span [ngClass]="selectedNomina?.estatus==='Pendiente'?'text-yellow-600 dark:text-yellow-400':'text-green-600 dark:text-green-400'">
+            <i class="pi mx-2" [ngClass]="selectedNomina?.estatus==='Pendiente'?'pi-clock':'pi-check-circle'"></i>
+            {{ selectedNomina?.estatus }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card ajustes -->
+    <div class="p-4 rounded-xl border bg-gray-50 dark:bg-gray-800 dark:border-gray-700 shadow-sm">
+      <h3 class="font-semibold mb-3 text-lg flex items-center gap-2 text-primary-700 dark:text-primary-300">
+        <i class="pi pi-sliders-h"></i> Ajustes editables
+      </h3>
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <label class="font-medium flex items-center gap-1"><i class="pi pi-gift"></i> Bonos</label>
+          <input pInputText type="number" [(ngModel)]="selectedNomina.bonos" class="w-full rounded-md dark:bg-gray-700 dark:text-white"/>
+        </div>
+        <div>
+          <label class="font-medium flex items-center gap-1"><i class="pi pi-exclamation-triangle"></i> Cargos F</label>
+          <input pInputText type="number" [(ngModel)]="selectedNomina.cargos_fiscal" class="w-full rounded-md dark:bg-gray-700 dark:text-white"/>
+        </div>
+        <div>
+          <label class="font-medium flex items-center gap-1"><i class="pi pi-exclamation-circle"></i> Cargos NF</label>
+          <input pInputText type="number" [(ngModel)]="selectedNomina.cargos_no_fiscal" class="w-full rounded-md dark:bg-gray-700 dark:text-white"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card Retenciones individuales -->
+    <div class="p-4 rounded-xl border bg-gray-50 dark:bg-gray-800 dark:border-gray-700 shadow-sm">
+      <h3 class="font-semibold mb-3 text-lg flex items-center gap-2 text-primary-700 dark:text-primary-300">
+        <i class="pi pi-percentage"></i> Retenciones
+      </h3>
+
+      <p-table [value]="selectedNomina.retenciones" [responsiveLayout]="'scroll'" class="p-datatable-sm dark:bg-gray-800 dark:text-gray-200 rounded-xl shadow border border-gray-200 dark:border-gray-700">
+        <ng-template pTemplate="header">
+          <tr class="bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-200 text-sm">
+            <th>Tipo</th>
+            <th>Monto</th>
+            <th>Observación</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-retencion let-i="rowIndex">
+          <tr class="hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors text-sm">
+            <td>
+              <p-select [options]="tiposRetencion" [(ngModel)]="retencion.tipo" appendTo="body" class="w-full dark:bg-gray-700 dark:text-white"></p-select>
+            </td>
+            <td>
+              <input pInputText type="number" [(ngModel)]="retencion.monto" class="w-full text-center rounded-md dark:bg-gray-700 dark:text-white"/>
+            </td>
+            <td>
+              <input pInputText type="text" [(ngModel)]="retencion.observacion" class="w-full rounded-md dark:bg-gray-700 dark:text-white"/>
+            </td>
+            <td class="text-center">
+              <button pButton type="button" icon="pi pi-trash" class="p-button-sm p-button-danger" (click)="eliminarRetencion(selectedNomina, i)"></button>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="4" class="text-right">
+              <button pButton type="button" label="Agregar Retención" icon="pi pi-plus" class="p-button-sm p-button-success" (click)="agregarRetencion(selectedNomina)"></button>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="4" class="text-right font-bold text-primary-700 dark:text-primary-300">
+              Total Retenciones: {{ retencionesTotales(selectedNomina) | currency:'MXN' }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Card totales -->
+    <div class="p-4 rounded-xl border bg-gray-50 dark:bg-gray-800 dark:border-gray-700 shadow-sm">
+      <h3 class="font-semibold mb-3 text-lg flex items-center gap-2 text-primary-700 dark:text-primary-300">
+        <i class="pi pi-chart-bar"></i> Totales y deducciones
+      </h3>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+        <div><strong>Total Fiscal:</strong> {{ calcularFiscal(selectedNomina) | currency:'MXN' }}</div>
+        <div><strong>Total No Fiscal:</strong> {{ calcularNoFiscal(selectedNomina) | currency:'MXN' }}</div>
+        <div class="text-lg font-bold col-span-2 md:col-span-3 text-center mt-2">
+          Neto a pagar: <span class="text-primary-700 dark:text-primary-300">{{ calcularTotalNeto(selectedNomina) | currency:'MXN':'symbol':'1.0-2' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <div class="flex justify-between w-full items-center">
+      <button pButton label="Cancelar" icon="pi pi-times" class="p-button-text dark:text-gray-200" (click)="cerrarDialog()"></button>
+      <div class="flex gap-3">
+        <button pButton label="Guardar" icon="pi pi-save" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2" (click)="guardarCambios()"></button>
+        <button pButton label="Finalizar" icon="pi pi-check-circle" class="bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2" (click)="finalizarNomina()"></button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>

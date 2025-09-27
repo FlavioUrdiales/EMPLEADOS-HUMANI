@@ -21,7 +21,15 @@
         </span>
       </div>
     </div>
-
+    <button
+      pButton
+      label="Generar Nómina Quincenal"
+      icon="pi pi-cog"
+      class="p-button-rounded p-button-warning"
+      (click)="generarNominaQuincenal()"
+      *ngIf="isQuincenaAnterior"
+      [disabled]="!rangoFechas || rangoFechas.length !== 2"
+    ></button>
     <p-datepicker
       [(ngModel)]="rangoFechas"
       selectionMode="range"
@@ -32,14 +40,7 @@
       class="w-full sm:w-64"
     ></p-datepicker>
 
-    <button
-      pButton
-      label="Generar Nómina Quincenal"
-      icon="pi pi-cog"
-      class="p-button-rounded p-button-warning"
-      (click)="generarNominaQuincenal()"
-      [disabled]="!rangoFechas || rangoFechas.length !== 2"
-    ></button>
+
   </div>
 
   <!-- Tarjetas de resumen 
@@ -352,3 +353,10 @@
     </ng-template>
   </p-table>
 </div>
+
+<app-nomina-dialog
+  [(visible)]="showNominaDialog"
+  [nominas]="nominaSeleccionada"
+  (guardar)="onGuardar($event)"
+  (finalizar)="onFinalizar($event)"
+></app-nomina-dialog>

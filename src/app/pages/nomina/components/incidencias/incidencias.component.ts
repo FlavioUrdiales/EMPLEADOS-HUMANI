@@ -13,6 +13,7 @@ import { PopoverModule } from 'primeng/popover';
 
 import { NominaService } from '../../services/nomina.service';
 import { RegistroAsistencia } from '../../interfaces/incidencias.interface';
+import { NominaDialogComponent } from '../nomina-dialog/nomina-dialog.component';
 
 interface DetalleIncidencia {
   fecha: string;
@@ -52,7 +53,8 @@ interface UsuarioResumen {
     TableModule,
     InputTextModule,
     TooltipModule,
-    PopoverModule
+    PopoverModule,
+    NominaDialogComponent
   ],
   templateUrl: './incidencias.component.html',
   providers: [ConfirmationService, MessageService],
@@ -60,7 +62,8 @@ interface UsuarioResumen {
 })
 export class IncidenciasComponent implements OnInit {
   private nominaService: NominaService = inject(NominaService);
-
+  public showNominaDialog: boolean = false;
+  public nominaSeleccionada: any = null;
   public registrosAsistencia: RegistroAsistencia[] = [];
   public rangoFechas: Date[] = [];
   public resumenNomina: UsuarioResumen[] = [];
@@ -88,12 +91,59 @@ export class IncidenciasComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    const fechaFin = new Date();
-    const fechaInicio = new Date();
-    fechaInicio.setDate(fechaFin.getDate() - 15);
+    this.setQuincenaAnterior();
+  }
+
+  setQuincenaAnterior(): void {
+    const hoy = new Date();
+    const year = hoy.getFullYear();
+    const month = hoy.getMonth();
+
+    let fechaInicio: Date;
+    let fechaFin: Date;
+
+    if (hoy.getDate() <= 15) {
+      // Si estamos en la primera quincena → regresar a la segunda del mes anterior
+      const mesAnterior = month - 1;
+      const ultimoDiaMesAnterior = new Date(year, month, 0); // último día del mes anterior
+      fechaInicio = new Date(year, mesAnterior, 16);
+      fechaFin = ultimoDiaMesAnterior;
+    } else {
+      // Si estamos en la segunda quincena → regresar a la primera del mismo mes
+      fechaInicio = new Date(year, month, 1);
+      fechaFin = new Date(year, month, 15);
+    }
+
     this.rangoFechas = [fechaInicio, fechaFin];
     this.buscarIncidencias();
   }
+
+
+  get isQuincenaAnterior(): boolean {
+    //validar si es la quincena anterior para saber si se puede generar la nomina quincenal
+    const hoy = new Date();
+    const year = hoy.getFullYear();
+    const month = hoy.getMonth();
+    const dia = hoy.getDate();
+
+    let fechaInicio: Date;
+    let fechaFin: Date;
+    if (dia <= 15) {
+      // Si estamos en la primera quincena → regresar a la segunda del mes anterior
+      const mesAnterior = month - 1;
+      const ultimoDiaMesAnterior = new Date(year, month, 0); // último día del mes anterior
+      fechaInicio = new Date(year, mesAnterior, 16);
+      fechaFin = ultimoDiaMesAnterior;
+    }
+    else {
+      // Si estamos en la segunda quincena → regresar a la primera del mismo mes
+      fechaInicio = new Date(year, month, 1);
+      fechaFin = new Date(year, month, 15);
+    }
+    return (this.rangoFechas[0].getTime() === fechaInicio.getTime() &&
+      this.rangoFechas[1].getTime() === fechaFin.getTime());
+  }
+
 
   buscarIncidencias(): void {
     if (
@@ -217,7 +267,7 @@ export class IncidenciasComponent implements OnInit {
       }
 
       // Verificar si trabajó
-// Verificar si trabajó o tiene permisos que cubren faltas
+      // Verificar si trabajó o tiene permisos que cubren faltas
       const diaTrabajado =
         r.primer_entrada !== null || r.salida_final !== null ||
         // Comprobar si hay incidencias cubiertas de faltas de entrada/salida
@@ -225,7 +275,7 @@ export class IncidenciasComponent implements OnInit {
           inc =>
             inc.cubierta &&
             (this.reglasPermisos['no_entrada'].includes(inc.codigo) ||
-            this.reglasPermisos['no_salida'].includes(inc.codigo))
+              this.reglasPermisos['no_salida'].includes(inc.codigo))
         );
 
       if (diaTrabajado) {
@@ -383,11 +433,20 @@ export class IncidenciasComponent implements OnInit {
     this.nominaService.generarNominaQuincenal(mes, anio, diasTrabajadosPorEmpleado, incidenciasPorEmpleado, rangoFechas, bonosPorEmpleado, cargosPorEmpleado, retencionesPorEmpleado).subscribe({
 
       next: (data) => {
+        this.showNominaDialog = true;
+        this.nominaSeleccionada = data.data;
+
         console.log('Nómina generada:', data);
       },
       error: (err) => console.error('Error al generar nómina:', err)
     });
   }
-    
+
+  onGuardar(nomina: any) {
+   console.log('Guardar nómina:', nomina);
+  }
+  onFinalizar(nomina: any) {
+    console.log('Finalizar nómina:', nomina);
+  }
 
 }
