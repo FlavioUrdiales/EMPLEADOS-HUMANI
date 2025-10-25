@@ -30,4 +30,19 @@ export class NominaService {
       return of(null);
     }));
   }
+
+  public guardarNomina(nomina: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}guardarNominas`, {nomina}).pipe(catchError((err) => {
+      this.toastService.error(err.status);
+      return of(null);
+    }));
+  }
+
+  public finalizarNomina(mes: number, anio: number, quincena: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}finalizarNomina`, {mes,anio,quincena}).pipe(catchError((err) => {
+      this.toastService.error(err.status);
+      return of(null);
+    }));
+  }
+
 }

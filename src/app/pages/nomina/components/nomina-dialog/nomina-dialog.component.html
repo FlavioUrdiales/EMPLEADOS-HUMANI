@@ -23,80 +23,83 @@
 
       <p-select *ngIf="viewMode === 'individual'" [options]="nominas" [(ngModel)]="selectedNomina" appendTo="body"
         optionLabel="nombre_empleado" placeholder="Selecciona empleado"
-        class="w-64 dark:bg-gray-800 dark:text-white">
+        class="w-64 dark:bg-gray-800 dark:text-white"
+        [disabled]="selectedNomina?.estatus !== 'Pendiente'">
       </p-select>
     </div>
   </div>
 
   <!-- VISTA TODOS -->
   <div *ngIf="viewMode === 'todos'">
-<p-table [value]="nominas" responsiveLayout="scroll"
-  class="p-datatable-sm dark:bg-gray-800 dark:text-gray-200 rounded-xl shadow border border-gray-200 dark:border-gray-700"
-  [scrollable]="true" scrollHeight="400px">
+    <p-table [value]="nominas" responsiveLayout="scroll"
+      class="p-datatable-sm dark:bg-gray-800 dark:text-gray-200 rounded-xl shadow border border-gray-200 dark:border-gray-700"
+      [scrollable]="true" scrollHeight="400px">
 
-  <ng-template pTemplate="header">
-    <tr class="bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-200 text-sm">
-      <th><i class="pi pi-user mr-1"></i> Empleado</th>
-      <th><i class="pi pi-dollar mr-1"></i> Sueldo Diario</th>
-      <th><i class="pi pi-gift mr-1 text-green-600"></i> Bonos</th>
-      <th><i class="pi pi-exclamation-triangle mr-1 text-yellow-500"></i> Cargos</th>
-      <th><i class="pi pi-percentage mr-1 text-red-500"></i> Retenciones</th>
-      <th><i class="pi pi-chart-line mr-1 text-blue-500"></i> Fiscal</th>
-      <th><i class="pi pi-chart-line mr-1 text-purple-500"></i> No Fiscal</th>
-      <th><i class="pi pi-wallet mr-1 text-green-600"></i> Neto</th>
-      <th><i class="pi pi-flag mr-1"></i> Estatus</th>
-    </tr>
-  </ng-template>
+      <ng-template pTemplate="header">
+        <tr class="bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-200 text-sm">
+          <th><i class="pi pi-user mr-1"></i> Empleado</th>
+          <th><i class="pi pi-dollar mr-1"></i> Sueldo Diario</th>
+          <th><i class="pi pi-gift mr-1 text-green-600"></i> Bonos</th>
+          <th><i class="pi pi-exclamation-triangle mr-1 text-yellow-500"></i> Cargos</th>
+          <th><i class="pi pi-percentage mr-1 text-red-500"></i> Retenciones</th>
+          <th><i class="pi pi-chart-line mr-1 text-blue-500"></i> Fiscal</th>
+          <th><i class="pi pi-chart-line mr-1 text-purple-500"></i> No Fiscal</th>
+          <th><i class="pi pi-wallet mr-1 text-green-600"></i> Neto</th>
+          <th><i class="pi pi-flag mr-1"></i> Estatus</th>
+        </tr>
+      </ng-template>
 
-  <ng-template pTemplate="body" let-row>
-    <tr class="hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors text-sm">
-      <td>
-        <strong>{{ row.nombre_empleado }}</strong> <br/>
-        <small class="text-gray-500">{{ row.chrClave }} | {{ row.dias_trabajados }} días</small>
-      </td>
-      <td class="text-right">{{ row.sueldo_diario_real | currency:'MXN' }}</td>
-      <td class="text-green-600 font-semibold">
-        <input pInputText type="number" [(ngModel)]="row.bonos"
-          class="w-20 rounded-md dark:bg-gray-700 dark:text-white text-center" />
-      </td>
-      <td class="text-yellow-600">
-        <input pInputText type="number" [(ngModel)]="row.cargos_fiscal"
-          class="w-20 rounded-md dark:bg-gray-700 dark:text-white text-center" placeholder="F"/>
-        <input pInputText type="number" [(ngModel)]="row.cargos_no_fiscal"
-          class="w-20 rounded-md dark:bg-gray-700 dark:text-white text-center" placeholder="NF"/>
-      </td>
-      <td class="text-red-600 font-medium">{{ retencionesTotales(row) | currency:'MXN' }}</td>
-      <td class="text-blue-600 font-semibold">{{ calcularFiscal(row) | currency:'MXN' }}</td>
-      <td class="text-purple-600 font-semibold">{{ calcularNoFiscal(row) | currency:'MXN' }}</td>
-      <td class="text-green-700 font-bold">{{ calcularTotalNeto(row) | currency:'MXN':'symbol':'1.0-2' }}</td>
-      <td class="text-center">
-        <i class="pi text-lg"
-          [ngClass]="{
-            'pi-clock text-yellow-500': row.estatus==='Pendiente',
-            'pi-check-circle text-green-500': row.estatus==='Finalizada',
-            'pi-times-circle text-red-500': row.estatus==='Cancelada'
-          }"
-          pTooltip="{{ row.estatus }}" tooltipPosition="top"></i>
-      </td>
-    </tr>
-  </ng-template>
+      <ng-template pTemplate="body" let-row>
+        <tr class="hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors text-sm">
+          <td>
+            <strong>{{ row.nombre_empleado }}</strong> <br/>
+            <small class="text-gray-500">{{ row.chrClave }} | {{ row.dias_trabajados }} días</small>
+          </td>
+          <td class="text-right">{{ row.sueldo_diario_real | currency:'MXN' }}</td>
+          <td class="text-green-600 font-semibold">
+            <input pInputText type="number" [(ngModel)]="row.bonos"
+              class="w-20 rounded-md dark:bg-gray-700 dark:text-white text-center"
+              [readonly]="row.estatus !== 'Pendiente'" />
+          </td>
+          <td class="text-yellow-600 flex gap-1">
+            <input pInputText type="number" [(ngModel)]="row.cargos_fiscal"
+              class="w-20 rounded-md dark:bg-gray-700 dark:text-white text-center" placeholder="F"
+              [readonly]="row.estatus !== 'Pendiente'" />
+            <input pInputText type="number" [(ngModel)]="row.cargos_no_fiscal"
+              class="w-20 rounded-md dark:bg-gray-700 dark:text-white text-center" placeholder="NF"
+              [readonly]="row.estatus !== 'Pendiente'" />
+          </td>
+          <td class="text-red-600 font-medium">{{ retencionesTotales(row) | currency:'MXN' }}</td>
+          <td class="text-blue-600 font-semibold">{{ calcularFiscal(row) | currency:'MXN' }}</td>
+          <td class="text-purple-600 font-semibold">{{ calcularNoFiscal(row) | currency:'MXN' }}</td>
+          <td class="text-green-700 font-bold">{{ calcularTotalNeto(row) | currency:'MXN':'symbol':'1.0-2' }}</td>
+          <td class="text-center">
+            <i class="pi text-lg"
+              [ngClass]="{
+                'pi-clock text-yellow-500': row.estatus==='Pendiente',
+                'pi-check-circle text-green-500': row.estatus==='Finalizada',
+                'pi-times-circle text-red-500': row.estatus==='Cancelada'
+              }"
+              pTooltip="{{ row.estatus }}" tooltipPosition="top"></i>
+          </td>
+        </tr>
+      </ng-template>
 
-  <!-- Totales -->
-  <ng-template pTemplate="footer">
-    <tr class="bg-primary-200 dark:bg-primary-800 font-semibold text-sm text-primary-900 dark:text-primary-200">
-      <td class="text-right pr-2"><i class="pi pi-sigma mr-1"></i> Totales:</td>
-      <td></td>
-      <td class="text-green-600">{{ total('bonos') | currency:'MXN' }}</td>
-      <td class="text-yellow-600">{{ total('cargos_fiscal') | currency:'MXN' }} / {{ total('cargos_no_fiscal') | currency:'MXN' }}</td>
-      <td class="text-red-600">{{ retencionesTotales() | currency:'MXN' }}</td>
-      <td class="text-blue-600">{{ totalFiscalTodos | currency:'MXN' }}</td>
-      <td class="text-purple-600">{{ totalNoFiscalTodos | currency:'MXN' }}</td>
-      <td class="text-green-700 font-bold">{{ totalNetoTodos() | currency:'MXN' }}</td>
-      <td></td>
-    </tr>
-  </ng-template>
-</p-table>
-
+      <!-- Totales -->
+      <ng-template pTemplate="footer">
+        <tr class="bg-primary-200 dark:bg-primary-800 font-semibold text-sm text-primary-900 dark:text-primary-200">
+          <td class="text-right pr-2"><i class="pi pi-sigma mr-1"></i> Totales:</td>
+          <td></td>
+          <td class="text-green-600">{{ total('bonos') | currency:'MXN' }}</td>
+          <td class="text-yellow-600">{{ total('cargos_fiscal') | currency:'MXN' }} / {{ total('cargos_no_fiscal') | currency:'MXN' }}</td>
+          <td class="text-red-600">{{ retencionesTotales() | currency:'MXN' }}</td>
+          <td class="text-blue-600">{{ totalFiscalTodos | currency:'MXN' }}</td>
+          <td class="text-purple-600">{{ totalNoFiscalTodos | currency:'MXN' }}</td>
+          <td class="text-green-700 font-bold">{{ totalNetoTodos() | currency:'MXN' }}</td>
+          <td></td>
+        </tr>
+      </ng-template>
+    </p-table>
   </div>
 
   <!-- VISTA INDIVIDUAL -->
@@ -112,8 +115,16 @@
         <div><strong>Clave:</strong> {{ selectedNomina?.chrClave }}</div>
         <div><strong>Quincena:</strong> {{ selectedNomina?.quincena }}/{{ selectedNomina?.mes }}/{{ selectedNomina?.anio }}</div>
         <div>
-          <span [ngClass]="selectedNomina?.estatus==='Pendiente'?'text-yellow-600 dark:text-yellow-400':'text-green-600 dark:text-green-400'">
-            <i class="pi mx-2" [ngClass]="selectedNomina?.estatus==='Pendiente'?'pi-clock':'pi-check-circle'"></i>
+          <span [ngClass]="{
+            'text-yellow-600 dark:text-yellow-400': selectedNomina?.estatus==='Pendiente',
+            'text-green-600 dark:text-green-400': selectedNomina?.estatus==='Finalizada',
+            'text-red-600 dark:text-red-400': selectedNomina?.estatus==='Cancelada'
+          }">
+            <i class="pi mx-2" [ngClass]="{
+              'pi-clock': selectedNomina?.estatus==='Pendiente',
+              'pi-check-circle': selectedNomina?.estatus==='Finalizada',
+              'pi-times-circle': selectedNomina?.estatus==='Cancelada'
+            }"></i>
             {{ selectedNomina?.estatus }}
           </span>
         </div>
@@ -128,15 +139,21 @@
       <div class="grid grid-cols-3 gap-4">
         <div>
           <label class="font-medium flex items-center gap-1"><i class="pi pi-gift"></i> Bonos</label>
-          <input pInputText type="number" [(ngModel)]="selectedNomina.bonos" class="w-full rounded-md dark:bg-gray-700 dark:text-white"/>
+          <input pInputText type="number" [(ngModel)]="selectedNomina.bonos"
+                 class="w-full rounded-md dark:bg-gray-700 dark:text-white"
+                 [readonly]="selectedNomina.estatus !== 'Pendiente'"/>
         </div>
         <div>
           <label class="font-medium flex items-center gap-1"><i class="pi pi-exclamation-triangle"></i> Cargos F</label>
-          <input pInputText type="number" [(ngModel)]="selectedNomina.cargos_fiscal" class="w-full rounded-md dark:bg-gray-700 dark:text-white"/>
+          <input pInputText type="number" [(ngModel)]="selectedNomina.cargos_fiscal"
+                 class="w-full rounded-md dark:bg-gray-700 dark:text-white"
+                 [readonly]="selectedNomina.estatus !== 'Pendiente'"/>
         </div>
         <div>
           <label class="font-medium flex items-center gap-1"><i class="pi pi-exclamation-circle"></i> Cargos NF</label>
-          <input pInputText type="number" [(ngModel)]="selectedNomina.cargos_no_fiscal" class="w-full rounded-md dark:bg-gray-700 dark:text-white"/>
+          <input pInputText type="number" [(ngModel)]="selectedNomina.cargos_no_fiscal"
+                 class="w-full rounded-md dark:bg-gray-700 dark:text-white"
+                 [readonly]="selectedNomina.estatus !== 'Pendiente'"/>
         </div>
       </div>
     </div>
@@ -160,16 +177,24 @@
         <ng-template pTemplate="body" let-retencion let-i="rowIndex">
           <tr class="hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors text-sm">
             <td>
-              <p-select [options]="tiposRetencion" [(ngModel)]="retencion.tipo" appendTo="body" class="w-full dark:bg-gray-700 dark:text-white"></p-select>
+              <p-select [options]="tiposRetencion" [(ngModel)]="retencion.tipo" appendTo="body"
+                        class="w-full dark:bg-gray-700 dark:text-white"
+                        [disabled]="selectedNomina.estatus !== 'Pendiente'"></p-select>
             </td>
             <td>
-              <input pInputText type="number" [(ngModel)]="retencion.monto" class="w-full text-center rounded-md dark:bg-gray-700 dark:text-white"/>
+              <input pInputText type="number" [(ngModel)]="retencion.monto"
+                     class="w-full text-center rounded-md dark:bg-gray-700 dark:text-white"
+                     [readonly]="selectedNomina.estatus !== 'Pendiente'" />
             </td>
             <td>
-              <input pInputText type="text" [(ngModel)]="retencion.observacion" class="w-full rounded-md dark:bg-gray-700 dark:text-white"/>
+              <input pInputText type="text" [(ngModel)]="retencion.observacion"
+                     class="w-full rounded-md dark:bg-gray-700 dark:text-white"
+                     [readonly]="selectedNomina.estatus !== 'Pendiente'" />
             </td>
             <td class="text-center">
-              <button pButton type="button" icon="pi pi-trash" class="p-button-sm p-button-danger" (click)="eliminarRetencion(selectedNomina, i)"></button>
+              <button pButton type="button" icon="pi pi-trash" class="p-button-sm p-button-danger"
+                      (click)="eliminarRetencion(selectedNomina, i)"
+                      [disabled]="selectedNomina.estatus !== 'Pendiente'"></button>
             </td>
           </tr>
         </ng-template>
@@ -177,7 +202,9 @@
         <ng-template pTemplate="footer">
           <tr>
             <td colspan="4" class="text-right">
-              <button pButton type="button" label="Agregar Retención" icon="pi pi-plus" class="p-button-sm p-button-success" (click)="agregarRetencion(selectedNomina)"></button>
+              <button pButton type="button" label="Agregar Retención" icon="pi pi-plus" class="p-button-sm p-button-success"
+                      (click)="agregarRetencion(selectedNomina)"
+                      [disabled]="selectedNomina.estatus !== 'Pendiente'"></button>
             </td>
           </tr>
           <tr>
@@ -188,6 +215,34 @@
         </ng-template>
       </p-table>
     </div>
+
+    <!-- Card incidencias aplicadas -->
+<div class="p-4 rounded-xl border bg-gray-50 dark:bg-gray-800 dark:border-gray-700 shadow-sm" *ngIf="selectedNomina?.incidencias_aplicadas?.length">
+  <h3 class="font-semibold mb-3 text-lg flex items-center gap-2 text-primary-700 dark:text-primary-300">
+    <i class="pi pi-exclamation-circle"></i> Incidencias aplicadas
+  </h3>
+
+  <p-table [value]="selectedNomina.incidencias_aplicadas" [responsiveLayout]="'scroll'" class="p-datatable-sm dark:bg-gray-800 dark:text-gray-200 rounded-xl shadow border border-gray-200 dark:border-gray-700">
+    <ng-template pTemplate="header">
+      <tr class="bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-200 text-sm">
+        <th>Fecha</th>
+        <th>Código</th>
+        <th>Descripción</th>
+        <th>Días descontados</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-incidencia>
+      <tr class="hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors text-sm">
+        <td>{{ incidencia.fecha }}</td>
+        <td>{{ incidencia.codigo }}</td>
+        <td>{{ incidencia.descripcion }}</td>
+        <td class="text-center">{{ incidencia.diasDescontados }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
 
     <!-- Card totales -->
     <div class="p-4 rounded-xl border bg-gray-50 dark:bg-gray-800 dark:border-gray-700 shadow-sm">
@@ -209,9 +264,12 @@
     <div class="flex justify-between w-full items-center">
       <button pButton label="Cancelar" icon="pi pi-times" class="p-button-text dark:text-gray-200" (click)="cerrarDialog()"></button>
       <div class="flex gap-3">
-        <button pButton label="Guardar" icon="pi pi-save" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2" (click)="guardarCambios()"></button>
-        <button pButton label="Finalizar" icon="pi pi-check-circle" class="bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2" (click)="finalizarNomina()"></button>
+        <button pButton label="Guardar" icon="pi pi-save" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2"
+                (click)="guardarCambios()" [disabled]="selectedNomina?.estatus !== 'Pendiente'"></button>
+        <button pButton label="Finalizar" icon="pi pi-check-circle" class="bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
+                (click)="finalizarNomina()" [disabled]="selectedNomina?.estatus !== 'Pendiente'"></button>
       </div>
     </div>
   </ng-template>
+
 </p-dialog>

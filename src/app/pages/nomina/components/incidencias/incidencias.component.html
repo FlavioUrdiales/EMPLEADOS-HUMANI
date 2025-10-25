@@ -354,7 +354,7 @@
   </p-table>
 </div>
 
-<app-nomina-dialog
+<app-nomina-dialog *ngIf="showNominaDialog"
   [(visible)]="showNominaDialog"
   [nominas]="nominaSeleccionada"
   (guardar)="onGuardar($event)"

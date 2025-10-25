@@ -14,6 +14,7 @@ import { PopoverModule } from 'primeng/popover';
 import { NominaService } from '../../services/nomina.service';
 import { RegistroAsistencia } from '../../interfaces/incidencias.interface';
 import { NominaDialogComponent } from '../nomina-dialog/nomina-dialog.component';
+import { ToastService } from '../../../../shared/services/toastService.service';
 
 interface DetalleIncidencia {
   fecha: string;
@@ -64,6 +65,7 @@ export class IncidenciasComponent implements OnInit {
   private nominaService: NominaService = inject(NominaService);
   public showNominaDialog: boolean = false;
   public nominaSeleccionada: any = null;
+  public toastService: ToastService = inject(ToastService);
   public registrosAsistencia: RegistroAsistencia[] = [];
   public rangoFechas: Date[] = [];
   public resumenNomina: UsuarioResumen[] = [];
@@ -444,9 +446,36 @@ export class IncidenciasComponent implements OnInit {
 
   onGuardar(nomina: any) {
    console.log('Guardar nómina:', nomina);
+   this.nominaService.guardarNomina(nomina).subscribe({
+     next: (data) => {
+        this.toastService.success('Nómina guardada correctamente');
+        this.showNominaDialog = false;
+      },
+      error: (err) => console.error('Error al guardar nómina:', err)
+    });
+
   }
   onFinalizar(nomina: any) {
-    console.log('Finalizar nómina:', nomina);
+    //primero guardamos los cambios
+    this.nominaService.guardarNomina(nomina).subscribe({
+      next: (data) => {
+        console.log('Nómina guardada antes de finalizar:', data);
+        this.finalizarNominaAPI(nomina);
+      }
+      ,
+      error: (err) => console.error('Error al guardar nómina antes de finalizar:', err)
+    });
+  }
+
+  finalizarNominaAPI(nomina: any) {
+    this.nominaService.finalizarNomina(nomina[0].mes, nomina[0].anio, nomina[0].quincena).subscribe({
+      next: (data) => {
+        this.toastService.success('Nómina finalizada correctamente');
+        this.showNominaDialog = false;
+      },
+      error: (err) => console.error('Error al finalizar nómina:', err)
+    });
+
   }
 
 }
