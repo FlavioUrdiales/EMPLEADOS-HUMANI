@@ -69,7 +69,6 @@ export interface User {
     chrDepartamento: string;
 }
 
-/*[{"chrclaveusuario":"MSANCHEZ","chrclaveperfil":"crudalumno"},{"chrclaveusuario":"MSANCHEZ","chrclaveperfil":"crudmaestro"},{"chrclaveusuario":"MSANCHEZ","chrclaveperfil":"diplomadoSeresc"},{"chrclaveusuario":"MSANCHEZ","chrclaveperfil":"inscripcion"},{"chrclaveusuario":"MSANCHEZ","chrclaveperfil":"operador"},{"chrclaveusuario":"MSANCHEZ","chrclaveperfil":"reportes"},{"chrclaveusuario":"MSANCHEZ","chrclaveperfil":"serviciosEscola"}]*/
 export interface Permisos {
     chrclaveusuario: string;
     chrclaveperfil: string;

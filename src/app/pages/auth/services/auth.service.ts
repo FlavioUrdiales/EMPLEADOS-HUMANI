@@ -24,13 +24,23 @@ export class AuthService {
     }));
   }
 
+  public getFotoUsuario(user:string): Observable<any> {
+    let data = {
+      data: user
+    };
+    return this.http.post<any>(`${this.URL}getFotoUsuario`,data).pipe(catchError((err) => {
+      console.log(err);
+      this.toastService.error(err.status);
+      return of({});
+    }));
+  }
+
   getToken(): string | null {
     return this.token || sessionStorage.getItem('token');
   }
 
   setToken(token: string): void {
     this.token = token;
-    console.log('Token set:', this.token);
     sessionStorage.setItem('token', token);
     localStorage.setItem('token', token); // Guardar en localStorage también
   }
@@ -42,8 +52,6 @@ export class AuthService {
 
 
   public isAuthenticated(): boolean {
-    // Primero revisamos en memoria (en este caso, la variable `token` interna o el valor del servicio)
-    console.log('Token en memoria:', this.token);
     const tokenFromMemory = this.token;
     if (tokenFromMemory && !this.jwtHelper.isTokenExpired(tokenFromMemory)) {
       return true;
@@ -87,5 +95,13 @@ export class AuthService {
       return of({});
     }));
   }
+
+  public logout(): void {
+    this.clearToken();
+    sessionStorage.clear();
+    localStorage.clear();
+    window.location.href = '/auth/login';
+  }
+
 }
 

@@ -263,7 +263,7 @@
   <ng-template pTemplate="footer">
     <div class="flex justify-between w-full items-center">
       <button pButton label="Cancelar" icon="pi pi-times" class="p-button-text dark:text-gray-200" (click)="cerrarDialog()"></button>
-      <div class="flex gap-3">
+      <div class="flex gap-3" *ngIf="!soloLectura">
         <button pButton label="Guardar" icon="pi pi-save" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2"
                 (click)="guardarCambios()" [disabled]="selectedNomina?.estatus !== 'Pendiente'"></button>
         <button pButton label="Finalizar" icon="pi pi-check-circle" class="bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"

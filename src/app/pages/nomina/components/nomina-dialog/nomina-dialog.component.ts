@@ -9,12 +9,7 @@ import { TableModule } from 'primeng/table';
 import { Tooltip } from 'primeng/tooltip';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-
-interface Retencion {
-  tipo: string | null;
-  monto: number | null;
-  observacion?: string | null;
-}
+import { Retencion } from '../../interfaces/nominas';
 
 @Component({
   selector: 'app-nomina-dialog',
@@ -31,6 +26,7 @@ export class NominaDialogComponent {
   @Input() visible: boolean = false;
   @Input() nominas: any[] = [];
   @Output() visibleChange = new EventEmitter<boolean>();
+  @Input() soloLectura: boolean = false;
   @Output() guardar = new EventEmitter<any[]>();
   @Output() finalizar = new EventEmitter<any[]>();
 

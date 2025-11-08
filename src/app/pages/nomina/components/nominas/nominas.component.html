@@ -1,0 +1,77 @@
+<div class="mx-auto">
+  <!-- Header -->
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-8 rounded-2xl bg-gradient-to-r from-primary/20 to-primary/10 shadow-md border border-primary/30 mb-6">
+    <div class="flex items-center gap-4">
+      <div class="bg-white dark:bg-gray-800 rounded-full p-5 shadow-lg flex items-center justify-center -mt-4">
+        <i class="pi pi-wallet text-primary text-3xl"></i>
+      </div>
+      <div>
+        <h2 class="text-3xl font-extrabold text-primary dark:text-primary-300 tracking-tight">
+          Nóminas
+        </h2>
+        <span class="text-sm text-gray-600 dark:text-gray-400">
+          Consulta las nóminas generadas y su estatus.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <p-table
+    #dt
+    [value]="lstNominas"
+    [paginator]="true"
+    [rows]="10"
+    responsiveLayout="scroll"
+    [rowsPerPageOptions]="[5,10,20]"
+    class="rounded-2xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
+
+    <!-- Header -->
+    <ng-template pTemplate="header">
+      <tr class="bg-gradient-to-r from-primary/10 to-primary/5 text-primary-800 dark:from-primary/20 dark:to-primary/10 dark:text-primary-200 uppercase text-sm">
+        <th class="px-4 py-3">Mes</th>
+        <th class="px-4 py-3">Año</th>
+        <th class="px-4 py-3">Quincena</th>
+        <th class="px-4 py-3">Rango de Fechas</th>
+        <th class="px-4 py-3">Estatus</th>
+        <th class="text-center px-4 py-3">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <!-- Body -->
+    <ng-template pTemplate="body" let-nomina>
+      <tr class="hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors">
+        <td class="px-4 py-3 text-center font-medium">{{ nomina.mes | number:'2.0' }}</td>
+        <td class="px-4 py-3 text-center font-medium">{{ nomina.anio }}</td>
+        <td class="px-4 py-3 text-center font-medium">{{ nomina.quincena }}</td>
+        <td class="px-4 py-3 text-center font-medium">{{ getRangoFechas(nomina) }}</td>
+        <td class="px-4 py-3 text-center">
+          <p-tag
+            [value]="getEstatusTag(nomina.estatus).value"
+            [severity]="getEstatusTag(nomina.estatus).severity"
+            class="font-semibold px-3 py-1 rounded-full text-sm">
+          </p-tag>
+        </td>
+        <td class="px-4 py-3 text-center">
+          <button
+            pButton
+            icon="pi pi-eye"
+            label=""
+            class="p-button-text p-button-rounded p-button-primary transition-transform hover:scale-105"
+            (click)="verDetalles(nomina)"
+            pTooltip="Ver detalles de la nómina"
+            tooltipPosition="top">
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+
+  </p-table>
+</div>
+
+<app-nomina-dialog *ngIf="showNominaDialog"
+  [(visible)]="showNominaDialog"
+  [nominas]="nominaSeleccionada"
+    [soloLectura]="true"
+></app-nomina-dialog>

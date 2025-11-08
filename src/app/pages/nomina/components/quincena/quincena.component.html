@@ -1,0 +1,197 @@
+<div class="mx-auto">
+  <!-- Toasts -->
+  <p-toast></p-toast>
+
+  <!-- Confirm Dialog -->
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header -->
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-8 rounded-2xl bg-gradient-to-r from-primary/20 to-primary/10 shadow-md border border-primary/30">
+    <div class="flex items-center gap-4">
+      <div class="bg-white dark:bg-gray-800 rounded-full p-5 shadow-lg flex items-center justify-center -mt-4">
+        <i class="pi pi-calendar text-primary text-3xl"></i>
+      </div>
+      <div class="flex flex-col">
+        <h2 class="text-3xl font-extrabold text-primary dark:text-primary-300 tracking-tight">
+          Nómina Quincenal
+        </h2>
+        <span class="text-sm text-gray-600 dark:text-gray-400">
+          Gestione y administre las quincenas de los empleados.
+        </span>
+      </div>
+    </div>
+
+    <button pButton label="Agregar Quincena" icon="pi pi-plus" class="p-button-rounded p-button-success"
+      (click)="agregarFila()"></button>
+  </div>
+
+  <hr class="my-4 border-primary/30 dark:border-primary/50 rounded" />
+
+  <!-- Tabla -->
+  <p-table #dt [value]="quincenas" dataKey="id" editMode="row" [editingRowKeys]="editingRowKeys"
+    [paginator]="true" [rows]="5" responsiveLayout="scroll"
+    class="rounded-2xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
+    
+    <ng-template pTemplate="header">
+      <tr class="bg-gradient-to-r from-primary/10 to-primary/5 text-primary-800 dark:from-primary/20 dark:to-primary/10 dark:text-primary-200">
+        <th>Empleado Código</th>
+        <th>Clave</th>
+        <th>Quincena</th>
+        <th>Sueldo Diario Real</th>
+        <th>Sueldo Diario Fiscal</th>
+        <th>Sueldo Diario No Fiscal</th>
+        <th>ISR Diario</th>
+        <th>IMSS Diario</th>
+        <th>Tope Sin Bonos</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-quincena let-editing="editing" let-ri="rowIndex">
+      <tr [pEditableRow]="quincena" class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+        
+        <!-- Empleado Código -->
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input pInputText [(ngModel)]="quincena.empleado_codigo"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2" />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ quincena.empleado_codigo }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <!-- Clave -->
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input pInputText [(ngModel)]="quincena.chrClave"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2" />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ quincena.chrClave }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <!-- Quincena -->
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input type="number"
+                     pInputText
+                     [(ngModel)]="quincena.quincena"
+                     (ngModelChange)="quincena.quincena = quincena.quincena > 2 ? 2 : (quincena.quincena < 1 ? 1 : quincena.quincena)"
+                     min="1" max="2"
+                     class="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2" />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ quincena.quincena }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <!-- Sueldo Diario Real -->
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input type="number" pInputText [(ngModel)]="quincena.sueldo_diario_real"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2" />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ quincena.sueldo_diario_real | number:'1.2-2' }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <!-- Sueldo Diario Fiscal -->
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input type="number" pInputText [(ngModel)]="quincena.sueldo_diario_fiscal"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2" />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ quincena.sueldo_diario_fiscal | number:'1.2-2' }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <!-- Sueldo Diario No Fiscal -->
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input type="number" pInputText [(ngModel)]="quincena.sueldo_diario_no_fiscal"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2" />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ quincena.sueldo_diario_no_fiscal | number:'1.2-2' }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <!-- ISR Diario -->
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input type="number" pInputText [(ngModel)]="quincena.isr_diario"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2" />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ quincena.isr_diario | number:'1.2-2' }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <!-- IMSS Diario -->
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input type="number" pInputText [(ngModel)]="quincena.imss_diario"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2" />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ quincena.imss_diario | number:'1.2-2' }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <!-- Tope Sin Bonos -->
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input type="number" pInputText [(ngModel)]="quincena.tope_sin_bonos"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2" />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ quincena.tope_sin_bonos | number:'1.2-2' }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <!-- Acciones -->
+        <td class="text-center flex gap-2 justify-center">
+          <!-- Editar -->
+          <p-button *ngIf="!editing" icon="pi pi-pencil" [text]="true" [raised]="true" severity="info"
+            title="Editar" (click)="editarFila(quincena)"></p-button>
+
+          <!-- Guardar -->
+          <p-button *ngIf="editing" icon="pi pi-check" [text]="true" [raised]="true" severity="success"
+            title="Guardar" (click)="guardarQuincena(quincena, ri)"></p-button>
+
+          <!-- Cancelar -->
+          <p-button *ngIf="editing" icon="pi pi-times" [text]="true" [raised]="true" severity="danger"
+            title="Cancelar" (click)="cancelarEdicion(quincena, ri)"></p-button>
+
+          <!-- Eliminar -->
+          <p-button icon="pi pi-trash" [text]="true" [raised]="true" severity="danger"
+            title="Eliminar" (click)="confirmarEliminar(quincena.id!)"></p-button>
+        </td>
+
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

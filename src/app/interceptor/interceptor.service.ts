@@ -13,7 +13,6 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
 
     return next(authReq);
   }
-  toastService.error('No autenticado');
 
   return next(req);
 };

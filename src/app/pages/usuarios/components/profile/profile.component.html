@@ -1,0 +1,104 @@
+<div class="flex justify-center mt-8">
+  <div class="w-full max-w-4xl bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-2xl overflow-hidden">
+
+    <!-- Banner superior -->
+    <div class="relative h-40 bg-gradient-to-r from-primary-400 to-primary-600">
+      <div class="absolute -bottom-16 left-1/2 transform -translate-x-1/2 md:left-12 md:translate-x-0">
+        <p-avatar
+          [image]="usuario.chrFoto ? usuario.chrFoto : 'assets/demo/images/avatar/default.png'"
+          shape="circle"
+          [style]="{ width: '130px', height: '130px', 'object-fit': 'cover' }"
+          styleClass="border-4 border-surface-0 dark:border-surface-900 shadow-3"
+        ></p-avatar>
+      </div>
+    </div>
+
+    <!-- Encabezado principal -->
+    <div class="pt-20 px-6 md:px-10 pb-6 border-b border-surface-200 dark:border-surface-700">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0">
+            {{ usuario.chrNombre }} {{ usuario.chrPaterno }} {{ usuario.chrMaterno }}
+          </h2>
+          <p class="text-surface-600 dark:text-surface-300 text-base">
+            {{ usuario.chrCargo || 'Sin cargo asignado' }}
+          </p>
+          <p class="text-surface-500 text-sm">
+            {{ usuario.chrDepartamento || 'Sin departamento' }}
+          </p>
+        </div>
+
+        <div class="flex gap-2 justify-center md:justify-end">
+          <p-tag
+            [value]="usuario.chrTipoUsuario"
+            severity="info"
+            icon="pi pi-user"
+          ></p-tag>
+          <p-tag
+            [value]="usuario.chrStatus"
+            [severity]="usuario.chrStatus === 'Activo' ? 'success' : 'danger'"
+            icon="pi pi-check-circle"
+          ></p-tag>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="px-6 md:px-10 py-8 space-y-10">
+
+      <!-- Información personal -->
+      <section>
+        <h3 class="text-lg font-semibold text-surface-800 dark:text-surface-100 mb-4 border-b border-surface-200 dark:border-surface-700 pb-2 flex items-center gap-2">
+          <i class="pi pi-id-card text-primary-500"></i>
+          Información personal
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-sm">
+          <p><span class="font-semibold">CURP:</span> {{ usuario.chrCurp || '-' }}</p>
+          <p><span class="font-semibold">RFC:</span> {{ usuario.chrRFC || '-' }}</p>
+          <p><span class="font-semibold">Género:</span> {{ usuario.chrGenero || '-' }}</p>
+          <p><span class="font-semibold">Fecha de nacimiento:</span> {{ usuario.dtFechaNacimiento | date:'mediumDate' }}</p>
+          <p><span class="font-semibold">Estado civil:</span> {{ usuario.chrEstadoCivil || '-' }}</p>
+          <p><span class="font-semibold">Tipo de sangre:</span> {{ usuario.chrTipodesangre || '-' }}</p>
+          <p><span class="font-semibold">Nacionalidad:</span> {{ usuario.chrNacionalidad || '-' }}</p>
+        </div>
+      </section>
+
+      <!-- Contacto -->
+      <section>
+        <h3 class="text-lg font-semibold text-surface-800 dark:text-surface-100 mb-4 border-b border-surface-200 dark:border-surface-700 pb-2 flex items-center gap-2">
+          <i class="pi pi-phone text-primary-500"></i>
+          Contacto
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-sm">
+          <p><span class="font-semibold">Teléfono:</span> {{ usuario.chrTelefono || '-' }}</p>
+          <p><span class="font-semibold">Correo:</span> {{ usuario.chrEmail || '-' }}</p>
+          <p class="col-span-2"><span class="font-semibold">Domicilio:</span> {{ usuario.chrDomicilio || '-' }}</p>
+          <p><span class="font-semibold">Contacto de emergencia:</span> {{ usuario.chrEmergenciasnombre || '-' }}</p>
+          <p><span class="font-semibold">Tel. emergencia:</span> {{ usuario.chrEmergenciastelefono || '-' }}</p>
+          <p class="col-span-2"><span class="font-semibold">Dirección emergencia:</span> {{ usuario.chrEmergenciasdireccion || '-' }}</p>
+        </div>
+      </section>
+
+      <!-- Información laboral -->
+      <section>
+        <h3 class="text-lg font-semibold text-surface-800 dark:text-surface-100 mb-4 border-b border-surface-200 dark:border-surface-700 pb-2 flex items-center gap-2">
+          <i class="pi pi-briefcase text-primary-500"></i>
+          Información laboral
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-sm">
+          <p><span class="font-semibold">Tipo de contratación:</span> {{ usuario.chrTipodecontratacion || '-' }}</p>
+          <p><span class="font-semibold">Tipo de horario:</span> {{ usuario.chrTipodehorario || '-' }}</p>
+          <p><span class="font-semibold">Fecha de ingreso:</span> {{ usuario.dtFechadeingreso | date:'mediumDate' }}</p>
+          <p><span class="font-semibold">Alta IMSS:</span> {{ usuario.dtFechadealtaimss | date:'mediumDate' }}</p>
+          <p><span class="font-semibold">Número de seguro social:</span> {{ usuario.chrNumerodeseguridadsocial || '-' }}</p>
+          <p><span class="font-semibold">Sueldo:</span> {{ usuario.fltSueldo | currency:'MXN' }}</p>
+          <p><span class="font-semibold">Ciclo:</span> {{ usuario.cveCiclo || '-' }}</p>
+          <p><span class="font-semibold">Modalidad:</span> {{ usuario.chrModalidad || '-' }}</p>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

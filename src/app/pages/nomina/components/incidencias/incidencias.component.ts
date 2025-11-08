@@ -15,31 +15,9 @@ import { NominaService } from '../../services/nomina.service';
 import { RegistroAsistencia } from '../../interfaces/incidencias.interface';
 import { NominaDialogComponent } from '../nomina-dialog/nomina-dialog.component';
 import { ToastService } from '../../../../shared/services/toastService.service';
+import { DetalleIncidencia, UsuarioResumen } from '../../interfaces/nominas';
 
-interface DetalleIncidencia {
-  fecha: string;
-  descripcion: string;
-  cubierta?: boolean;
-}
 
-interface UsuarioResumen {
-  clave_usuario: string;
-  usuario: string;
-  diasConTurno: number;
-  diasTrabajados: number;
-  diasConIncidencias: number;
-  totalIncidencias: number;
-  incidencias: Record<
-    string,
-    {
-      count: number;
-      descripcion: string;
-      cubierta?: boolean;
-      detalles?: DetalleIncidencia[];
-    }
-  >;
-  permisos: { count: number; detalles: string[] };
-}
 
 @Component({
   selector: 'app-incidencias',
@@ -154,7 +132,6 @@ export class IncidenciasComponent implements OnInit {
       !this.rangoFechas[0] ||
       !this.rangoFechas[1]
     ) {
-      console.warn('Rango de fechas incompleto');
       return;
     }
 
@@ -163,7 +140,6 @@ export class IncidenciasComponent implements OnInit {
 
     this.nominaService.getReporteAdministrativos(fechaInicioStr, fechaFinStr).subscribe({
       next: (data) => {
-        console.log('Data recibida:', data);
         this.registrosAsistencia = data.map((reg) => ({
           ...reg,
           incidencias: this.normalizarIncidencias(reg) ?? []
@@ -236,10 +212,7 @@ export class IncidenciasComponent implements OnInit {
     this.registrosAsistencia.forEach((r) => {
       const user = r.usuario;
       if (!mapa[user]) {
-        const incidenciasInit: Record<
-          string,
-          { count: number; descripcion: string; cubierta?: boolean; detalles?: DetalleIncidencia[] }
-        > = {};
+        const incidenciasInit: Record<string,{ count: number; descripcion: string; cubierta?: boolean; detalles?: DetalleIncidencia[] }> = {};
         codigos.forEach(
           (c) =>
           (incidenciasInit[c] = {
@@ -326,7 +299,6 @@ export class IncidenciasComponent implements OnInit {
       }
     });
 
-    console.log('Resumen nómina:', mapa);
     return Object.values(mapa);
   }
 
@@ -438,16 +410,14 @@ export class IncidenciasComponent implements OnInit {
         this.showNominaDialog = true;
         this.nominaSeleccionada = data.data;
 
-        console.log('Nómina generada:', data);
       },
       error: (err) => console.error('Error al generar nómina:', err)
     });
   }
 
   onGuardar(nomina: any) {
-   console.log('Guardar nómina:', nomina);
-   this.nominaService.guardarNomina(nomina).subscribe({
-     next: (data) => {
+    this.nominaService.guardarNomina(nomina).subscribe({
+      next: (data) => {
         this.toastService.success('Nómina guardada correctamente');
         this.showNominaDialog = false;
       },
@@ -459,7 +429,6 @@ export class IncidenciasComponent implements OnInit {
     //primero guardamos los cambios
     this.nominaService.guardarNomina(nomina).subscribe({
       next: (data) => {
-        console.log('Nómina guardada antes de finalizar:', data);
         this.finalizarNominaAPI(nomina);
       }
       ,

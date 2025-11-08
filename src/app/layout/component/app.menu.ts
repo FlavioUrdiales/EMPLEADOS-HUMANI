@@ -24,7 +24,6 @@ export class AppMenu {
                 label: 'Home',
                 items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
             },
-            /*Permisos -----> Levantar permiso*/
             {
                 label: 'Permisos',
                 items: [
@@ -32,19 +31,21 @@ export class AppMenu {
                     { label: 'Autorizaciones', icon: 'pi pi-fw pi-check-square', routerLink: ['/pages/permiso/autorizaciones'] }
                 ]
             },
-            /*Nómina -----> Levantar nómina*/
             {
                 label: 'Nómina',
                 items: [
-                    { label: 'Incidencias', icon: 'pi pi-fw pi-calendar-times', routerLink: ['/pages/nomina/incidencias'] }
+                    { label: 'Incidencias', icon: 'pi pi-fw pi-calendar-times', routerLink: ['/pages/nomina/incidencias'] },
+                    { label: 'Días Festivos', icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/pages/nomina/diasfestivos'] },
+                    { label: 'Nóminas', icon: 'pi pi-fw pi-money-bill', routerLink: ['/pages/nomina/nominas'] }
                 ]
             },
 
-            /*Usuarios -----> Levantar usuarios*/
             {
                 label: 'Usuarios',
                 items: [
                     { label: 'Relación de Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/pages/usuarios/usuarios'] }
+                    , { label: 'Quincenas', icon: 'pi pi-fw pi-money-bill', routerLink: ['/pages/nomina/quincenas'] }
+
                 ]
             },
         ];

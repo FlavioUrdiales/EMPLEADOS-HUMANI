@@ -1,0 +1,126 @@
+<div class="mx-auto">
+  <!-- Toasts -->
+  <p-toast></p-toast>
+
+  <!-- Confirm Dialog -->
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header -->
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-8 rounded-2xl bg-gradient-to-r from-primary/20 to-primary/10 shadow-md border border-primary/30">
+    <div class="flex items-center gap-4">
+      <div class="bg-white dark:bg-gray-800 rounded-full p-5 shadow-lg flex items-center justify-center -mt-4">
+        <i class="pi pi-calendar text-primary text-3xl"></i>
+      </div>
+      <div class="flex flex-col">
+        <h2 class="text-3xl font-extrabold text-primary dark:text-primary-300 tracking-tight">
+          Días Festivos
+        </h2>
+        <span class="text-sm text-gray-600 dark:text-gray-400">
+          Gestione y administre los días festivos.
+        </span>
+      </div>
+    </div>
+
+    <button pButton label="Agregar Día Festivo" icon="pi pi-plus" class="p-button-rounded p-button-success"
+      (click)="agregarFila()"></button>
+  </div>
+
+  <hr class="my-4 border-primary/30 dark:border-primary/50 rounded" />
+
+  <!-- Tabla -->
+  <p-table #dt [value]="dias" dataKey="id" editMode="row" [editingRowKeys]="editingRowKeys"
+    [paginator]="true" [rows]="10" responsiveLayout="scroll"
+    class="rounded-2xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
+
+    <ng-template pTemplate="header">
+      <tr class="bg-gradient-to-r from-primary/10 to-primary/5 text-primary-800 dark:from-primary/20 dark:to-primary/10 dark:text-primary-200">
+        <th>Fecha</th>
+        <th>Nombre</th>
+        <th>Tipo</th>
+        <th>Año</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-dia let-editing="editing" let-ri="rowIndex">
+      <tr [pEditableRow]="dia" class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+
+        <!-- Fecha -->
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input type="date" pInputText [(ngModel)]="dia.fecha"
+                     class="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2" />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ dia.fecha }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <!-- Nombre -->
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input pInputText [(ngModel)]="dia.nombre"
+                     class="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2" />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ dia.nombre }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <!-- Tipo -->
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <select pInputText [(ngModel)]="dia.tipo"
+                      class="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2">
+                <option value="OFICIAL">OFICIAL</option>
+                <option value="ADICIONAL">ADICIONAL</option>
+              </select>
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ dia.tipo }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <!-- Año -->
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input type="number" pInputText [(ngModel)]="dia.anio"
+                     class="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2" />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ dia.anio }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <!-- Acciones -->
+        <td class="text-center flex gap-2 justify-center">
+          <!-- Editar -->
+          <p-button *ngIf="!editing" icon="pi pi-pencil" [text]="true" [raised]="true" severity="info"
+            title="Editar" (click)="editarFila(dia)"></p-button>
+
+          <!-- Guardar -->
+          <p-button *ngIf="editing" icon="pi pi-check" [text]="true" [raised]="true" severity="success"
+            title="Guardar" (click)="guardarDia(dia, ri)"></p-button>
+
+          <!-- Cancelar -->
+          <p-button *ngIf="editing" icon="pi pi-times" [text]="true" [raised]="true" severity="danger"
+            title="Cancelar" (click)="cancelarEdicion(dia, ri)"></p-button>
+
+          <!-- Eliminar -->
+          <p-button icon="pi pi-trash" [text]="true" [raised]="true" severity="danger"
+            title="Eliminar" (click)="confirmarEliminar(dia.id!)"></p-button>
+        </td>
+
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
