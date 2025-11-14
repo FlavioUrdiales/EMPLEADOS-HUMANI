@@ -10,7 +10,7 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
 import { AuthService } from './services/auth.service';
 import { ToastService } from '../../shared/services/toastService.service';
 import { LoginInterface } from './interfaces/login';
-import { PermisosHelper } from '../../shared/helpers/permisos.helper';
+import { getDatosUsuario, PermisosHelper } from '../../shared/helpers/permisos.helper';
 
 @Component({
     selector: 'app-login',
@@ -81,8 +81,8 @@ export class Login {
             next: (res: any) => {
                 if (res.response != null) {
                     sessionStorage.setItem('token', res.data);
-
-                    this.helperPermisos.tienePermisoSistema().subscribe({
+                    const user = getDatosUsuario();
+                    this.helperPermisos.tienePermisoSistema(user.chrClave).subscribe({
                         next: (res: any) => {
                             if (res) {
                                 this.toastService.success('Bienvenido de nuevo');

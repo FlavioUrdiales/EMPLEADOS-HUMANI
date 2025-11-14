@@ -5,26 +5,21 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { User } from "../../pages/auth/interfaces/user";
 import { JwtHelperService } from "@auth0/angular-jwt";
+import { MenuService } from "../../layout/service/menu/menu.service";
 
 @Injectable({
   providedIn: 'root',
 })
 export class PermisosHelper {
   private permisosSistema: string[] = environment.permisosSistema;
+  constructor(private auth: AuthService,private menuService: MenuService) { }
 
-  constructor(private auth: AuthService) { }
-
-  public tienePermisoSistema(): Observable<boolean> {
-    return this.auth.getPermisosUsuario().pipe(
-      map((response: any) => {
-        if (response && response.data) {
-          return response.data.some((element: any) =>
-            this.permisosSistema.includes(element.chrclaveperfil)
-          );
-        }
-        return false;
-      })
-    );
+  public tienePermisoSistema(usuario:string): Observable<boolean> {
+  return this.menuService.getMenuByUsuario(usuario, environment.id_sistema).pipe(
+      map(res => {
+        return res.data.length > 0;
+      }
+    ));
   }
 }
 

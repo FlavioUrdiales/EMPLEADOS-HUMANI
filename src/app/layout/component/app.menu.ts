@@ -1,8 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
+import { MenuService } from '../service/menu/menu.service';
+import { User } from '../../pages/auth/interfaces/user';
+import { getDatosUsuario } from '../../shared/helpers/permisos.helper';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-menu',
@@ -17,37 +21,19 @@ import { AppMenuitem } from './app.menuitem';
 })
 export class AppMenu {
     model: MenuItem[] = [];
+    private menuService: MenuService = inject(MenuService);
+    private user: User = getDatosUsuario();
 
     ngOnInit() {
-        this.model = [
-            {
-                label: 'Home',
-                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
+         this.menuService.getMenuByUsuario(this.user.chrClave, environment.id_sistema).subscribe({
+            next: (res) => {
+                this.model = res.data;
             },
-            {
-                label: 'Permisos',
-                items: [
-                    { label: 'Solicitud de Permiso', icon: 'pi pi-fw pi-file', routerLink: ['/pages/permiso/solicitud'] },
-                    { label: 'Autorizaciones', icon: 'pi pi-fw pi-check-square', routerLink: ['/pages/permiso/autorizaciones'] }
-                ]
-            },
-            {
-                label: 'Nómina',
-                items: [
-                    { label: 'Incidencias', icon: 'pi pi-fw pi-calendar-times', routerLink: ['/pages/nomina/incidencias'] },
-                    { label: 'Días Festivos', icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/pages/nomina/diasfestivos'] },
-                    { label: 'Nóminas', icon: 'pi pi-fw pi-money-bill', routerLink: ['/pages/nomina/nominas'] }
-                ]
-            },
+            error: (err) => {
 
-            {
-                label: 'Usuarios',
-                items: [
-                    { label: 'Relación de Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/pages/usuarios/usuarios'] }
-                    , { label: 'Quincenas', icon: 'pi pi-fw pi-money-bill', routerLink: ['/pages/nomina/quincenas'] }
+                console.error('Error al cargar el menú:', err);
+            }
+        });
 
-                ]
-            },
-        ];
     }
 }

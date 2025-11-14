@@ -10,8 +10,10 @@ export const environment = {
   ENDPOINT_CHECADOR: 'http://localhost:3000/checador/',
   ENDPOINT_QUINCENA: 'http://localhost:3000/nomina_quincenal',
   ENDPOINT_DIAS_FESTIVOS: 'http://localhost:3000/diasfestivos',
+  ENDPOINT_MENU: 'http://localhost:3000/modulos/',
   VERSION: '0.0.0.1',
   permisosSistema: [ "superAdmin"],
+  id_sistema: 1,
   DESARROLLADOR: 'Flavio Urdiales Mena',
 };
 

@@ -1,38 +1,57 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { AuthService } from '../pages/auth/services/auth.service';
-import { map, take } from 'rxjs/operators';
+import { Injectable, inject } from '@angular/core';
+import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { MenuService } from '../layout/service/menu/menu.service';
+import { getDatosUsuario } from '../shared/helpers/permisos.helper';
+import { environment } from '../../environments/environment';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class PermisoGuard implements CanActivate {
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-    const permisosRequeridos: string[] = route.data['permisos'] || [];
+  private menuService: MenuService = inject(MenuService);
+  private router: Router = inject(Router);
+  private user = getDatosUsuario();
 
-    return this.authService.getPermisosUsuario().pipe(
-      take(1), 
-      map((response : any ) => {
-        if (response?.response !== 'success' || !Array.isArray(response.data)) {
-          this.router.navigate(['/auth/error']); 
-          return false;
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> {
+
+    // Obtenemos la ruta que se intenta acceder
+    const url = state.url;
+
+    return this.menuService.getMenuByUsuario(this.user.chrClave, environment.id_sistema).pipe(
+      map(res => {
+        const allowed = this.verificarPermiso(res.data, url);
+        if (!allowed) {
+          // Redirigir a una página de "sin permiso" o dashboard
+          this.router.navigate(['/']);
         }
-
-        const permisosUsuario = response.data.map((p: { chrclaveperfil: string }) => p.chrclaveperfil);
-        const tienePermiso = permisosRequeridos.some(permiso => permisosUsuario.includes(permiso));
-
-        if (!tienePermiso) {
-          this.router.navigate(['/auth/access']); 
-          return false;
-        }
-        return true;
+        return allowed;
+      }),
+      catchError(err => {
+        console.error('Error al validar permisos', err);
+        this.router.navigate(['/']);
+        return of(false);
       })
     );
+  }
+
+  // Función recursiva para verificar permiso en el menú
+  private verificarPermiso(menu: any[], url: string): boolean {
+    for (const item of menu) {
+      if (item.items) {
+        if (this.verificarPermiso(item.items, url)) {
+          return true;
+        }
+      }
+      if (item.routerLink && item.routerLink.includes(url)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
