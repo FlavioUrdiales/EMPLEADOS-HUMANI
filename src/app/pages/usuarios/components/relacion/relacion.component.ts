@@ -13,15 +13,9 @@ import { AvatarModule } from 'primeng/avatar';
 import { ChipModule } from 'primeng/chip';
 import { PopoverModule } from 'primeng/popover';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { UsuarioChecador } from '../../interfaces/usuario-checador.interface';
 
-interface UsuarioChecador {
-  id: number;
-  checador_user_id: string;
-  chrClaveUsuario: string;
-  chrNombre: string;
-  chrPaterno: string;
-  chrMaterno: string;
-}
+
 
 @Component({
   selector: 'app-relacion',

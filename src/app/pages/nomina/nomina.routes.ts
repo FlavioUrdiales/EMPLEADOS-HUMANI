@@ -27,5 +27,15 @@ export default [
         canActivate: [PermisoGuard]
 
     },
+
+    //turnos
+    {
+        path: 'turnos',
+        loadComponent: () => import('./components/turnos/turnos.component').then(m => m.TurnosComponent),
+        canActivate: [PermisoGuard]
+    },
+
+    
+    
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

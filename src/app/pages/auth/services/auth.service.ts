@@ -30,7 +30,6 @@ export class AuthService {
     };
     return this.http.post<any>(`${this.URL}getFotoUsuario`,data).pipe(catchError((err) => {
       console.log(err);
-      this.toastService.error(err.status);
       return of({});
     }));
   }

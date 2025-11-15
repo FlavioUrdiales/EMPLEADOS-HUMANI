@@ -68,7 +68,7 @@ import { getDatosUsuario } from '../../shared/helpers/permisos.helper';
                 class="layout-topbar-action"
                 (click)="userMenu.toggle($event)">
                 <p-avatar
-                    [image]="usuario.chrFoto ? usuario.chrFoto : 'assets/demo/images/avatar/default.png'"
+                    [image]="usuario.chrFoto ? usuario.chrFoto : 'https://img.freepik.com/vecteurs-premium/it-specialist-vector-character-flat-style-illustration_1033579-67109.jpg'"
                     shape="circle"
                     size="large"
                     styleClass="cursor-pointer"></p-avatar>

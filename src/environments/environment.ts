@@ -11,6 +11,7 @@ export const environment = {
   ENDPOINT_QUINCENA: 'http://localhost:3000/nomina_quincenal',
   ENDPOINT_DIAS_FESTIVOS: 'http://localhost:3000/diasfestivos',
   ENDPOINT_MENU: 'http://localhost:3000/modulos/',
+  ENDPOINT_TURNOS: 'http://localhost:3000/turnos',
   VERSION: '0.0.0.1',
   permisosSistema: [ "superAdmin"],
   id_sistema: 1,

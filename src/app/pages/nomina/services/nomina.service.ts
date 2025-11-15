@@ -16,14 +16,19 @@ export class NominaService {
   private http: HttpClient = inject(HttpClient);
   private toastService = inject(ToastService);
 
-  public getReporteAdministrativos(fechaInicio: string, fechaFin: string): Observable<RegistroAsistencia[]> {
-    return this.http.post<RegistroAsistencia[]>(`${this.apiUrl}getReporteAdministrativos`, { fechaInicio, fechaFin }).pipe(catchError((err) => {
+  public getReporteAdministrativos(fechaInicio: string, fechaFin: string,usuario : any = null): Observable<RegistroAsistencia[]> {
+    return this.http.post<RegistroAsistencia[]>(`${this.apiUrl}getReporteAdministrativos`, { fechaInicio, fechaFin,usuario }).pipe(catchError((err) => {
       this.toastService.error(err.status);
       return of([]);
     }));
   }
 
-
+  public getReporteAdministrativosByUser(fechaInicio: string, fechaFin: string,usuario : string): Observable<RegistroAsistencia[]> {
+    return this.http.post<RegistroAsistencia[]>(`${this.apiUrl}getReporteAdministrativos`, { fechaInicio, fechaFin, usuario }).pipe(catchError((err) => {
+      this.toastService.error(err.status);
+      return of([]);
+    }));
+  }
 
   public generarNominaQuincenal(mes: number, anio: number, diasTrabajadosPorEmpleado: any, incidenciasPorEmpleado: any, rangoFechas: any, bonosPorEmpleado: any = [], cargosPorEmpleado: any = [], retencionesPorEmpleado: any = []): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}generarNominaQuincenal`, { mes, anio, diasTrabajadosPorEmpleado, incidenciasPorEmpleado, rangoFechas, bonosPorEmpleado, cargosPorEmpleado, retencionesPorEmpleado }).pipe(catchError((err) => {
