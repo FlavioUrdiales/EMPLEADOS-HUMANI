@@ -35,9 +35,9 @@ export class NominaDialogComponent {
   selectedNomina: any = null;
   viewMode: 'individual' | 'todos' = 'todos';
 
-  tiposRetencion = ['ISR','IMSS','Infonavit','Afore','Fonacot','Préstamo','Multa','Otro'];
+  tiposRetencion = ['ISR', 'IMSS', 'Infonavit', 'Afore', 'Fonacot', 'Préstamo', 'Multa', 'Otro'];
 
-  constructor(private messageService: MessageService) {}
+  constructor(private messageService: MessageService) { }
 
   ngOnChanges() {
     if (this.nominas?.length && !this.selectedNomina) {
@@ -51,7 +51,7 @@ export class NominaDialogComponent {
   }
 
   esFiscales(tipo: string | null): boolean {
-    const fiscales = ['ISR','IMSS','Infonavit','Afore'];
+    const fiscales = ['ISR', 'IMSS', 'Infonavit', 'Afore'];
     return tipo ? fiscales.includes(tipo) : false;
   }
 
@@ -88,7 +88,7 @@ export class NominaDialogComponent {
       .filter((r: Retencion | null) => r && this.esFiscales(r.tipo))
       .reduce((sum: number, r: Retencion | null) => sum + (r?.monto != null ? parseFloat(r.monto as any) : 0), 0);
 
-    const fiscalDisponible = parseFloat(nomina.total_sueldo_fiscal) - (parseFloat(nomina.cargos_fiscal)||0);
+    const fiscalDisponible = parseFloat(nomina.total_sueldo_fiscal) - (parseFloat(nomina.cargos_fiscal) || 0);
     let excedente = retencionesFiscalesTotales - fiscalDisponible;
     if (excedente < 0) excedente = 0;
 
@@ -105,6 +105,8 @@ export class NominaDialogComponent {
 
     return totalNoFiscal + bonos - cargosNF - retencionesNF;
   }
+
+  
 
   calcularTotalNeto(nomina: any): number {
     return this.calcularFiscal(nomina) + this.calcularNoFiscal(nomina);
@@ -150,31 +152,47 @@ export class NominaDialogComponent {
 
   retencionesTotales(nomina?: any): number {
     if (nomina) {
-      return (nomina.retenciones || []).reduce((sum: number, r: Retencion | null) => 
+      return (nomina.retenciones || []).reduce((sum: number, r: Retencion | null) =>
         sum + (r?.monto != null ? parseFloat(r.monto as any) : 0), 0
       );
     }
 
     return this.nominas.reduce((sum: number, row: any) => {
-      const totalRet = (row.retenciones || []).reduce((s: number, r: Retencion | null) => 
+      const totalRet = (row.retenciones || []).reduce((s: number, r: Retencion | null) =>
         s + (r?.monto != null ? parseFloat(r.monto as any) : 0), 0
       );
       return sum + totalRet;
     }, 0);
   }
 
-  descargarRecibos() {
-    if (!this.nominas) return;
-    //calcular no fiscal para cada nomina
-    let dataOrignal = this.nominas;
-    let data = this.nominas;
-    data.forEach(nomina => {
-      nomina.total_sueldo_no_fiscal = this.calcularNoFiscal(nomina) 
-    });
+descargarRecibos() {
+  if (!this.nominas) return;
 
-    this.ReciboNominaService.generarMultiplesRecibos(data);
-    this.nominas = dataOrignal;
-    /*this.ReciboNominaService.generarMultiplesRecibos(this.nominas);
-    console.log('Descargando recibos para:', this.nominas);*/
+  const dataParaPdf = this.nominas.map(nomina => ({
+    ...nomina,
+    total_sueldo_no_fiscal: this.calcularNoFiscal(nomina)
+  }));
+
+  this.ReciboNominaService.generarMultiplesRecibos(dataParaPdf);
+}
+
+  totalDiasDescontados(nomina?: any): number {
+    if (nomina) {
+      return nomina.dias_descontados || 0;
+    }
+    return this.nominas.reduce((sum: number, row: any) => sum + (row.dias_descontados || 0), 0);
   }
+
+  totalDineroDescontado(nomina?: any): number {
+    if (nomina) {
+      return (nomina.incidencias_aplicadas || []).reduce((sum: number, inc: any) => sum + (inc.dinero_descontado || 0), 0);
+    }
+    return this.nominas.reduce((sum: number, row: any) => {
+      const totalDescontado = (row.incidencias_aplicadas || []).reduce((s: number, inc: any) => s + (inc.dinero_descontado || 0), 0);
+      return sum + totalDescontado;
+    }, 0);
+  }
+
+
+
 }

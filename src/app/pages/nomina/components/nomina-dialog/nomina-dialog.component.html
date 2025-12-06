@@ -1,6 +1,6 @@
 <p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '95vw', maxWidth: '1200px' }" [closable]="false"
-    (onHide)="cerrarDialog()" contentClass="dark:bg-gray-900 bg-white rounded-2xl shadow-xl"
-    headerClass="bg-primary-600 text-white dark:bg-primary-700 rounded-t-2xl px-6 py-4">
+  (onHide)="cerrarDialog()" contentClass="dark:bg-gray-900 bg-white rounded-2xl shadow-xl"
+  headerClass="bg-primary-600 text-white dark:bg-primary-700 rounded-t-2xl px-6 py-4">
 
   <!-- Header -->
   <div class="flex items-center gap-3">
@@ -14,17 +14,15 @@
   <!-- Vista selector -->
   <div class="flex justify-between items-center mb-6 mt-4">
     <div class="flex gap-3 items-center">
-      <button pButton
-        [label]="viewMode === 'todos' ? 'Vista por empleado' : 'Vista todos'"
+      <button pButton [label]="viewMode === 'todos' ? 'Vista por empleado' : 'Vista todos'"
         [icon]="viewMode === 'todos' ? 'pi pi-user' : 'pi pi-users'"
         class="p-button-sm bg-primary-600 hover:bg-primary-700 text-white rounded-lg px-3 py-1"
         (click)="viewMode = viewMode === 'todos' ? 'individual' : 'todos'">
       </button>
 
       <p-select *ngIf="viewMode === 'individual'" [options]="nominas" [(ngModel)]="selectedNomina" appendTo="body"
-        optionLabel="nombre_empleado" placeholder="Selecciona empleado"
-        class="w-64 dark:bg-gray-800 dark:text-white"
-        [disabled]="selectedNomina?.estatus !== 'Pendiente'">
+        optionLabel="nombre_empleado" placeholder="Selecciona empleado" class="w-64 dark:bg-gray-800 dark:text-white"
+        >
       </p-select>
     </div>
   </div>
@@ -52,7 +50,7 @@
       <ng-template pTemplate="body" let-row>
         <tr class="hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors text-sm">
           <td>
-            <strong>{{ row.nombre_empleado }}</strong> <br/>
+            <strong>{{ row.nombre_empleado }}</strong> <br />
             <small class="text-gray-500">{{ row.chrClave }} | {{ row.dias_trabajados }} días</small>
           </td>
           <td class="text-right">{{ row.sueldo_diario_real | currency:'MXN' }}</td>
@@ -72,15 +70,33 @@
           <td class="text-red-600 font-medium">{{ retencionesTotales(row) | currency:'MXN' }}</td>
           <td class="text-blue-600 font-semibold">{{ calcularFiscal(row) | currency:'MXN' }}</td>
           <td class="text-purple-600 font-semibold">{{ calcularNoFiscal(row) | currency:'MXN' }}</td>
-          <td class="text-green-700 font-bold">{{ calcularTotalNeto(row) | currency:'MXN':'symbol':'1.0-2' }}</td>
+          <!--Si tiene incidencias aplicadas mostrar una alarta de incidencias-->
+          <td class="align-middle">
+            <!-- TOTAL NETO -->
+            <div class="text-green-700 font-bold text-sm leading-tight">
+              {{ calcularTotalNeto(row) | currency:'MXN':'symbol':'1.0-2' }}
+            </div>
+
+            <!-- DESCUENTOS (solo si hay incidencias) -->
+            <div *ngIf="row.incidencias_aplicadas?.length" class="flex items-center gap-2 mt-1">
+
+              <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
+                {{ totalDineroDescontado(row) | currency:'MXN' }}
+              </span>
+
+              <i class="pi pi-exclamation-triangle text-yellow-500 text-xs"
+                pTooltip="Este empleado tiene incidencias aplicadas" tooltipPosition="top">
+              </i>
+            </div>
+          </td>
+
+
           <td class="text-center">
-            <i class="pi text-lg"
-              [ngClass]="{
+            <i class="pi text-lg" [ngClass]="{
                 'pi-clock text-yellow-500': row.estatus==='Pendiente',
                 'pi-check-circle text-green-500': row.estatus==='Finalizada',
                 'pi-times-circle text-red-500': row.estatus==='Cancelada'
-              }"
-              pTooltip="{{ row.estatus }}" tooltipPosition="top"></i>
+              }" pTooltip="{{ row.estatus }}" tooltipPosition="top"></i>
           </td>
         </tr>
       </ng-template>
@@ -91,7 +107,8 @@
           <td class="text-right pr-2"><i class="pi pi-sigma mr-1"></i> Totales:</td>
           <td></td>
           <td class="text-green-600">{{ total('bonos') | currency:'MXN' }}</td>
-          <td class="text-yellow-600">{{ total('cargos_fiscal') | currency:'MXN' }} / {{ total('cargos_no_fiscal') | currency:'MXN' }}</td>
+          <td class="text-yellow-600">{{ total('cargos_fiscal') | currency:'MXN' }} / {{ total('cargos_no_fiscal') |
+            currency:'MXN' }}</td>
           <td class="text-red-600">{{ retencionesTotales() | currency:'MXN' }}</td>
           <td class="text-blue-600">{{ totalFiscalTodos | currency:'MXN' }}</td>
           <td class="text-purple-600">{{ totalNoFiscalTodos | currency:'MXN' }}</td>
@@ -113,7 +130,8 @@
       <div class="grid grid-cols-2 gap-4 text-sm">
         <div><strong>Empleado:</strong> {{ selectedNomina?.nombre_empleado }}</div>
         <div><strong>Clave:</strong> {{ selectedNomina?.chrClave }}</div>
-        <div><strong>Quincena:</strong> {{ selectedNomina?.quincena }}/{{ selectedNomina?.mes }}/{{ selectedNomina?.anio }}</div>
+        <div><strong>Quincena:</strong> {{ selectedNomina?.quincena }}/{{ selectedNomina?.mes }}/{{ selectedNomina?.anio
+          }}</div>
         <div>
           <span [ngClass]="{
             'text-yellow-600 dark:text-yellow-400': selectedNomina?.estatus==='Pendiente',
@@ -140,20 +158,20 @@
         <div>
           <label class="font-medium flex items-center gap-1"><i class="pi pi-gift"></i> Bonos</label>
           <input pInputText type="number" [(ngModel)]="selectedNomina.bonos"
-                 class="w-full rounded-md dark:bg-gray-700 dark:text-white"
-                 [readonly]="selectedNomina.estatus !== 'Pendiente'"/>
+            class="w-full rounded-md dark:bg-gray-700 dark:text-white"
+            [readonly]="selectedNomina.estatus !== 'Pendiente'" />
         </div>
         <div>
           <label class="font-medium flex items-center gap-1"><i class="pi pi-exclamation-triangle"></i> Cargos F</label>
           <input pInputText type="number" [(ngModel)]="selectedNomina.cargos_fiscal"
-                 class="w-full rounded-md dark:bg-gray-700 dark:text-white"
-                 [readonly]="selectedNomina.estatus !== 'Pendiente'"/>
+            class="w-full rounded-md dark:bg-gray-700 dark:text-white"
+            [readonly]="selectedNomina.estatus !== 'Pendiente'" />
         </div>
         <div>
           <label class="font-medium flex items-center gap-1"><i class="pi pi-exclamation-circle"></i> Cargos NF</label>
           <input pInputText type="number" [(ngModel)]="selectedNomina.cargos_no_fiscal"
-                 class="w-full rounded-md dark:bg-gray-700 dark:text-white"
-                 [readonly]="selectedNomina.estatus !== 'Pendiente'"/>
+            class="w-full rounded-md dark:bg-gray-700 dark:text-white"
+            [readonly]="selectedNomina.estatus !== 'Pendiente'" />
         </div>
       </div>
     </div>
@@ -164,7 +182,8 @@
         <i class="pi pi-percentage"></i> Retenciones
       </h3>
 
-      <p-table [value]="selectedNomina.retenciones" [responsiveLayout]="'scroll'" class="p-datatable-sm dark:bg-gray-800 dark:text-gray-200 rounded-xl shadow border border-gray-200 dark:border-gray-700">
+      <p-table [value]="selectedNomina.retenciones" [responsiveLayout]="'scroll'"
+        class="p-datatable-sm dark:bg-gray-800 dark:text-gray-200 rounded-xl shadow border border-gray-200 dark:border-gray-700">
         <ng-template pTemplate="header">
           <tr class="bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-200 text-sm">
             <th>Tipo</th>
@@ -178,23 +197,23 @@
           <tr class="hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors text-sm">
             <td>
               <p-select [options]="tiposRetencion" [(ngModel)]="retencion.tipo" appendTo="body"
-                        class="w-full dark:bg-gray-700 dark:text-white"
-                        [disabled]="selectedNomina.estatus !== 'Pendiente'"></p-select>
+                class="w-full dark:bg-gray-700 dark:text-white"
+                [disabled]="selectedNomina.estatus !== 'Pendiente'"></p-select>
             </td>
             <td>
               <input pInputText type="number" [(ngModel)]="retencion.monto"
-                     class="w-full text-center rounded-md dark:bg-gray-700 dark:text-white"
-                     [readonly]="selectedNomina.estatus !== 'Pendiente'" />
+                class="w-full text-center rounded-md dark:bg-gray-700 dark:text-white"
+                [readonly]="selectedNomina.estatus !== 'Pendiente'" />
             </td>
             <td>
               <input pInputText type="text" [(ngModel)]="retencion.observacion"
-                     class="w-full rounded-md dark:bg-gray-700 dark:text-white"
-                     [readonly]="selectedNomina.estatus !== 'Pendiente'" />
+                class="w-full rounded-md dark:bg-gray-700 dark:text-white"
+                [readonly]="selectedNomina.estatus !== 'Pendiente'" />
             </td>
             <td class="text-center">
               <button pButton type="button" icon="pi pi-trash" class="p-button-sm p-button-danger"
-                      (click)="eliminarRetencion(selectedNomina, i)"
-                      [disabled]="selectedNomina.estatus !== 'Pendiente'"></button>
+                (click)="eliminarRetencion(selectedNomina, i)"
+                [disabled]="selectedNomina.estatus !== 'Pendiente'"></button>
             </td>
           </tr>
         </ng-template>
@@ -202,9 +221,9 @@
         <ng-template pTemplate="footer">
           <tr>
             <td colspan="4" class="text-right">
-              <button pButton type="button" label="Agregar Retención" icon="pi pi-plus" class="p-button-sm p-button-success"
-                      (click)="agregarRetencion(selectedNomina)"
-                      [disabled]="selectedNomina.estatus !== 'Pendiente'"></button>
+              <button pButton type="button" label="Agregar Retención" icon="pi pi-plus"
+                class="p-button-sm p-button-success" (click)="agregarRetencion(selectedNomina)"
+                [disabled]="selectedNomina.estatus !== 'Pendiente'"></button>
             </td>
           </tr>
           <tr>
@@ -217,31 +236,51 @@
     </div>
 
     <!-- Card incidencias aplicadas -->
-<div class="p-4 rounded-xl border bg-gray-50 dark:bg-gray-800 dark:border-gray-700 shadow-sm" *ngIf="selectedNomina?.incidencias_aplicadas?.length">
-  <h3 class="font-semibold mb-3 text-lg flex items-center gap-2 text-primary-700 dark:text-primary-300">
-    <i class="pi pi-exclamation-circle"></i> Incidencias aplicadas
-  </h3>
+    <div class="p-4 rounded-xl border bg-gray-50 dark:bg-gray-800 dark:border-gray-700 shadow-sm"
+      *ngIf="selectedNomina?.incidencias_aplicadas?.length">
+      <h3 class="font-semibold mb-3 text-lg flex items-center gap-2 text-primary-700 dark:text-primary-300">
+        <i class="pi pi-exclamation-circle"></i> Incidencias aplicadas
+      </h3>
 
-  <p-table [value]="selectedNomina.incidencias_aplicadas" [responsiveLayout]="'scroll'" class="p-datatable-sm dark:bg-gray-800 dark:text-gray-200 rounded-xl shadow border border-gray-200 dark:border-gray-700">
-    <ng-template pTemplate="header">
-      <tr class="bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-200 text-sm">
-        <th>Fecha</th>
-        <th>Código</th>
-        <th>Descripción</th>
-        <th>Días descontados</th>
-      </tr>
-    </ng-template>
+      <p-table [value]="selectedNomina.incidencias_aplicadas" [responsiveLayout]="'scroll'"
+        class="p-datatable-sm dark:bg-gray-800 dark:text-gray-200 rounded-xl shadow border border-gray-200 dark:border-gray-700">
+        <ng-template pTemplate="header">
+          <tr class="bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-200 text-sm">
+            <th>Fecha</th>
+            <th>Código</th>
+            <th>Descripción</th>
+            <th>Días descontados</th>
+          </tr>
+        </ng-template>
 
-    <ng-template pTemplate="body" let-incidencia>
-      <tr class="hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors text-sm">
-        <td>{{ incidencia.fecha }}</td>
-        <td>{{ incidencia.codigo }}</td>
-        <td>{{ incidencia.descripcion }}</td>
-        <td class="text-center">{{ incidencia.diasDescontados }}</td>
-      </tr>
-    </ng-template>
-  </p-table>
-</div>
+        <ng-template pTemplate="body" let-incidencia>
+          <tr class="hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors text-sm">
+            <td>{{ incidencia.fecha }}</td>
+            <td>{{ incidencia.codigo }}</td>
+            <td>{{ incidencia.descripcion }}</td>
+            <td class="text-center">{{ incidencia.diasDescontados }}</td>
+          </tr>
+        </ng-template>
+        <!--Footer con total de $ descontado campo dinero_descontado-->
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="2" class="text-right font-bold text-primary-700 dark:text-primary-300">
+              Total Días Descontados:
+            </td>
+            <td class="text-center font-bold text-primary-700 dark:text-primary-300">
+              ${{ totalDineroDescontado(selectedNomina) | number:'1.2-2' }}
+            </td>
+
+            <td class="text-center font-bold text-primary-700 dark:text-primary-300">
+              {{ totalDiasDescontados(selectedNomina) }}
+            </td>
+          </tr>
+        </ng-template>
+
+
+
+      </p-table>
+    </div>
 
 
     <!-- Card totales -->
@@ -253,7 +292,8 @@
         <div><strong>Total Fiscal:</strong> {{ calcularFiscal(selectedNomina) | currency:'MXN' }}</div>
         <div><strong>Total No Fiscal:</strong> {{ calcularNoFiscal(selectedNomina) | currency:'MXN' }}</div>
         <div class="text-lg font-bold col-span-2 md:col-span-3 text-center mt-2">
-          Neto a pagar: <span class="text-primary-700 dark:text-primary-300">{{ calcularTotalNeto(selectedNomina) | currency:'MXN':'symbol':'1.0-2' }}</span>
+          Neto a pagar: <span class="text-primary-700 dark:text-primary-300">{{ calcularTotalNeto(selectedNomina) |
+            currency:'MXN':'symbol':'1.0-2' }}</span>
         </div>
       </div>
     </div>
@@ -262,15 +302,17 @@
   <!-- Footer -->
   <ng-template pTemplate="footer">
     <div class="flex justify-between w-full items-center">
-      <button pButton label="Cancelar" icon="pi pi-times" class="p-button-text dark:text-gray-200" (click)="cerrarDialog()"></button>
-      <div class="flex gap-3">
-        <button pButton label="Guardar" icon="pi pi-save" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2"
-                (click)="guardarCambios()" [disabled]="selectedNomina?.estatus !== 'Pendiente'"></button>
-        <button pButton label="Finalizar" icon="pi pi-check-circle" class="bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
-                (click)="finalizarNomina()" [disabled]="selectedNomina?.estatus !== 'Pendiente'"></button>
-                <button pButton label="Descargar recibos" icon="pi pi-download" class="bg-gray-600 hover:bg-gray-700 text-white rounded-lg px-4 py-2"
+      <button pButton label="Cancelar" icon="pi pi-times" class="p-button-text dark:text-gray-200"
+        (click)="cerrarDialog()"></button>
+      <div class="flex gap-3" >
+        <button pButton label="Guardar" icon="pi pi-save"
+          class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2" (click)="guardarCambios()"
+          [disabled]="selectedNomina?.estatus !== 'Pendiente'"></button>
+        <button pButton label="Finalizar" icon="pi pi-check-circle"
+          class="bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2" (click)="finalizarNomina()"
+          [disabled]="selectedNomina?.estatus !== 'Pendiente'"></button>
+           <button pButton label="Descargar recibos" icon="pi pi-download" class="bg-gray-600 hover:bg-gray-700 text-white rounded-lg px-4 py-2"
                 (click)="descargarRecibos()" [disabled]="!selectedNomina" *ngIf="selectedNomina?.estatus === 'Procesada'"></button>
-
       </div>
     </div>
   </ng-template>

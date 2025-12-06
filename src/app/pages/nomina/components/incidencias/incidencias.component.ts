@@ -62,7 +62,7 @@ export class IncidenciasComponent implements OnInit {
 
   // Reglas de permisos
   private reglasPermisos: Record<string, string[]> = {
-    faltar: ['FAL_ENT', 'FAL_SAL'],
+    faltar: ['FAL_ENT', 'FAL_SAL', 'RET_ENT', 'SAL_ANT', 'NO_CH_COM', 'RET_SAL_COM', 'RET_REG_COM'],
     llegar_tarde: ['RET_ENT'],
     salir_temprano: ['SAL_ANT'],
     no_entrada: ['FAL_ENT'],
@@ -388,6 +388,7 @@ export class IncidenciasComponent implements OnInit {
       acc[usuario.clave_usuario] = usuario.diasConTurno;
       return acc;
     }, {} as { [key: string]: number });
+
 
     let incidenciasPorEmpleado: Record<string, any[]> = this.resumenNomina.reduce((acc: { [key: string]: any[] }, usuario) => {
       acc[usuario.clave_usuario] = Object.entries(usuario.incidencias).map(([codigo, info]) => ({

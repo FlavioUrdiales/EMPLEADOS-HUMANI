@@ -22,7 +22,7 @@ export class ReciboNominaService {
     private generarDoc(data: ReciboNominaRaw) {
         const totalIngresos = parseFloat(data.total_sueldo_no_fiscal || '0').toFixed(2);
         const totalNeto = parseFloat(data.total_sueldo_no_fiscal || '0').toFixed(2);
-        
+
         const docDefinition: any = {
             pageOrientation: 'portrait',
             pageMargins: [40, 40, 40, 40],
@@ -32,10 +32,10 @@ export class ReciboNominaService {
                     columns: [
                         {
                             width: '*',
-                            text: 'SISTEMA DE EDUCACIÓN SUPERIOR DE LEÓN A.C.',
-                            fontSize: 11,
+                            text: environment.NOMBRE_EMPRESA,
+                            fontSize: 8,
                             bold: true,
-                            alignment: 'center',
+                            alignment: 'left',
                             margin: [0, 0, 0, 0]
                         },
                         {
@@ -43,7 +43,7 @@ export class ReciboNominaService {
                             columns: [
                                 {
                                     text: 'NO.',
-                                    fontSize: 9,
+                                    fontSize: 8,
                                     margin: [0, 2, 5, 0]
                                 },
                                 {
@@ -54,7 +54,7 @@ export class ReciboNominaService {
                                                 {
                                                     text: data.id.toString(),
                                                     alignment: 'right',
-                                                    fontSize: 9
+                                                    fontSize: 8
                                                 }
                                             ]
                                         ]
@@ -77,11 +77,11 @@ export class ReciboNominaService {
                         body: [
                             // Fila 1: NOMBRE / PERIODO
                             [
-                                { text: 'NOMBRE:', bold: true, fontSize: 9 },
-                                { text: data.nombre_empleado, fontSize: 9 },
+                                { text: 'NOMBRE:', bold: true, fontSize: 8 },
+                                { text: data.nombre_empleado, fontSize: 8 },
                                 {
                                     text: `PERIODO: ${this.getRangoFechas(data)}`,
-                                    fontSize: 9
+                                    fontSize: 8
                                 }
                             ],
                             // Fila 2: ENCABEZADOS INGRESOS / EGRESOS
@@ -91,7 +91,7 @@ export class ReciboNominaService {
                                     colSpan: 2,
                                     alignment: 'center',
                                     bold: true,
-                                    fontSize: 9,
+                                    fontSize: 8,
                                     fillColor: '#E0E0E0'
                                 },
                                 {},
@@ -99,16 +99,16 @@ export class ReciboNominaService {
                                     text: 'EGRESOS',
                                     alignment: 'center',
                                     bold: true,
-                                    fontSize: 9,
+                                    fontSize: 8,
                                     fillColor: '#E0E0E0'
                                 }
                             ],
                             // Fila 3: HONORARIOS
                             [
-                                { text: 'HONORARIOS', fontSize: 9 },
+                                { text: 'HONORARIOS', fontSize: 8 },
                                 {
                                     text: `$ ${totalIngresos}`,
-                                    fontSize: 9,
+                                    fontSize: 8,
                                     alignment: 'center',
                                     fillColor: '#E0E0E0'
                                 },
@@ -116,9 +116,9 @@ export class ReciboNominaService {
                             ],
                             // Fila 4: TOTAL (dentro de la tabla grande)
                             [
-                                { text: 'Total', bold: true, fontSize: 9 },
-                                { text: '', fontSize: 9 },
-                                { text: '', fontSize: 9 }
+                                { text: 'Total', bold: true, fontSize: 8 },
+                                { text: '', fontSize: 8 },
+                                { text: '', fontSize: 8 }
                             ]
                         ]
                     },
@@ -137,19 +137,19 @@ export class ReciboNominaService {
                                 {
                                     text: 'Total neto',
                                     bold: true,
-                                    fontSize: 9,
+                                    fontSize: 8,
                                     alignment: 'center',
                                     decoration: 'underline'
                                 },
                                 {
                                     text: '$',
-                                    fontSize: 9,
+                                    fontSize: 8,
                                     alignment: 'center',
                                     decoration: 'underline'
                                 },
                                 {
                                     text: totalNeto,
-                                    fontSize: 9,
+                                    fontSize: 8,
                                     alignment: 'center',
                                     decoration: 'underline'
                                 }
@@ -165,13 +165,13 @@ export class ReciboNominaService {
                         {
                             width: 'auto',
                             text: 'RECIBO LA CANTIDAD DE:',
-                            fontSize: 9
+                            fontSize: 8
                         },
                         {
                             width: 'auto',
                             text: `${this.numeroALetras(parseFloat(totalNeto))} 00/100`,
                             bold: true,
-                            fontSize: 9,
+                            fontSize: 8,
                             margin: [5, 0, 0, 0]
                         },
                         { width: '*', text: '' }
@@ -180,7 +180,7 @@ export class ReciboNominaService {
                 },
                 {
                     text: 'PESOS. POR LA PRESTACIÓN DE SERVICIOS PROFESIONALES PARA IMPARTICION DE CLASES',
-                    fontSize: 9,
+                    fontSize: 8,
                     margin: [0, 0, 0, 40]
                 },
                 // ===== FIRMA =====
@@ -200,12 +200,12 @@ export class ReciboNominaService {
                                     text: data.nombre_empleado,
                                     bold: true,
                                     alignment: 'center',
-                                    fontSize: 9
+                                    fontSize: 8
                                 },
                                 {
                                     text: 'FIRMA DE RECIBIDO',
                                     alignment: 'center',
-                                    fontSize: 9
+                                    fontSize: 8
                                 }
                             ]
                         },
@@ -224,10 +224,45 @@ export class ReciboNominaService {
             else pdf.download(`recibo_${recibo.id}.pdf`);
         });
     }
-    // ================== NUMERO A LETRAS (BASICO) ==================
+    // ================== NUMERO A LETRAS ==================
     private numeroALetras(valor: number): string {
-        return valor.toFixed(0).toString();
+        const unidades = ['CERO', 'UNO', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE'];
+        const decenas = ['', 'DIEZ', 'VEINTE', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'];
+        const especiales = ['DIEZ', 'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISÉIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE'];
+        const centenas = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'];
+
+        const convertirCentenas = (num: number): string => {
+            if (num === 100) return 'CIEN';
+            const c = Math.floor(num / 100);
+            const d = Math.floor((num % 100) / 10);
+            const u = num % 10;
+            let texto = c > 0 ? centenas[c] + ' ' : '';
+            if (d === 1) texto += especiales[u];
+            else {
+                if (d > 1) texto += decenas[d];
+                if (d > 1 && u > 0) texto += ' Y ';
+                if (u > 0 && d !== 1) texto += unidades[u];
+            }
+            return texto.trim();
+        }
+
+        if (valor === 0) return 'CERO';
+
+        const entero = Math.floor(valor);
+        const miles = Math.floor(entero / 1000);
+        const resto = entero % 1000;
+        let textoFinal = '';
+
+        if (miles > 0) textoFinal += miles === 1 ? 'MIL ' : `${convertirCentenas(miles)} MIL `;
+        if (resto > 0) textoFinal += convertirCentenas(resto);
+
+        const decimales = Math.round((valor - entero) * 100);
+        if (decimales > 0) textoFinal += ` CON ${decimales}/100`;
+
+        return textoFinal.trim();
     }
+
+    
     // ================== PERIODO ==================
     public getRangoFechas(nomina: ReciboNominaRaw): string {
         const { mes, anio, quincena } = nomina;
