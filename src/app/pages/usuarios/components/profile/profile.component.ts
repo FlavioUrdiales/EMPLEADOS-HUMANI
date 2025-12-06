@@ -18,7 +18,7 @@ import { AuthService } from '../../../auth/services/auth.service';
 export class ProfileComponent {
   usuario: User = getDatosUsuario();
   private authService = inject(AuthService);
-
+  permisos: any = [];
   ngOnInit(): void {
     // Si quieres actualizar la foto al cargar
     this.authService.getFotoUsuario(this.usuario.chrClave).subscribe({
@@ -26,6 +26,13 @@ export class ProfileComponent {
         if (res?.data) {
           this.usuario.chrFoto = res.data;
         }
+      }
+    });
+
+    this.authService.getPermisosUsuario().subscribe({
+      next: (res) => {
+        console.log('Permisos del usuario:', res);
+        this.permisos = res.data || [];
       }
     });
   }

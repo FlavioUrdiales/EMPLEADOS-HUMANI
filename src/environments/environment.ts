@@ -12,10 +12,14 @@ export const environment = {
   ENDPOINT_DIAS_FESTIVOS: 'http://localhost:3000/diasfestivos',
   ENDPOINT_MENU: 'http://localhost:3000/modulos/',
   ENDPOINT_TURNOS: 'http://localhost:3000/turnos',
+  ENDPOINT_INSCRIPCIONES: 'https://msinscripcion.unimundial.edu.mx/inscripciones/',
+
   VERSION: '0.0.0.1',
   permisosSistema: [ "superAdmin"],
   id_sistema: 1,
   DESARROLLADOR: 'Flavio Urdiales Mena',
+  NOMBRE_SISTEMA: 'EMPLEADOS-HUMANI',
+  NOMBRE_EMPRESA: 'SISTEMA DE EDICACIÓN SUPERIOR DE LEÓN A.C.',
 };
 
 

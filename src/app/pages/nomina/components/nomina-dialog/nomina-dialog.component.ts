@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -10,6 +10,7 @@ import { Tooltip } from 'primeng/tooltip';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Retencion } from '../../interfaces/nominas';
+import { ReciboNominaService } from '../../../../shared/services/pdf/nomina.service.ts/recibo-nomina.service';
 
 @Component({
   selector: 'app-nomina-dialog',
@@ -29,7 +30,8 @@ export class NominaDialogComponent {
   @Input() soloLectura: boolean = false;
   @Output() guardar = new EventEmitter<any[]>();
   @Output() finalizar = new EventEmitter<any[]>();
-
+  private ReciboNominaService: ReciboNominaService = inject(ReciboNominaService);
+  
   selectedNomina: any = null;
   viewMode: 'individual' | 'todos' = 'todos';
 
@@ -159,5 +161,20 @@ export class NominaDialogComponent {
       );
       return sum + totalRet;
     }, 0);
+  }
+
+  descargarRecibos() {
+    if (!this.nominas) return;
+    //calcular no fiscal para cada nomina
+    let dataOrignal = this.nominas;
+    let data = this.nominas;
+    data.forEach(nomina => {
+      nomina.total_sueldo_no_fiscal = this.calcularNoFiscal(nomina) 
+    });
+
+    this.ReciboNominaService.generarMultiplesRecibos(data);
+    this.nominas = dataOrignal;
+    /*this.ReciboNominaService.generarMultiplesRecibos(this.nominas);
+    console.log('Descargando recibos para:', this.nominas);*/
   }
 }

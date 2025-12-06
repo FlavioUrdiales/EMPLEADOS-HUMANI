@@ -20,6 +20,8 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import { PermisosService } from '../../services/permisos.service';
 import { ToastService } from '../../../../shared/services/toastService.service';
 import { CorreoJefe, TipoPermiso } from '../../interfaces/permisos.interface';
+import { CorreosService } from '../../../../shared/services/correos/correos.service';
+import { CorreosRequest } from '../../../../layout/interfaces/correos';
 @Component({
   selector: 'app-permiso-form',
   standalone: true,
@@ -47,6 +49,7 @@ export class PermisoFormComponent implements OnInit {
   form: FormGroup;
   private user: User = getDatosUsuario();
   private permisosService: PermisosService = inject(PermisosService);
+  private correosService = inject(CorreosService);
 
   tipoFechaSeleccionado: 'rango' | 'individual' = 'rango';
   nuevoDia?: Date;
@@ -171,6 +174,31 @@ export class PermisoFormComponent implements OnInit {
       this.permisosService.create(sendingData).subscribe({
         next: (resp) => {
           this.toastService.success('Permiso guardado con éxito');
+          let data: CorreosRequest = {
+            data: {
+              correo: value.correo_jefe,
+              asunto: 'Nueva solicitud de permiso',
+              body: `<p>Hola,</p>
+                       <p>El colaborador ${value.nombre_colaborador} ha solicitado un permiso.</p>
+                        <p>Motivo: ${value.motivo_permiso}</p>
+                        <p>Fechas: ${value.fecha_inicio?.toLocaleDateString()} - ${value.fecha_fin?.toLocaleDateString()}</p>
+                        <p>Por favor, revisa y autoriza o rechaza la solicitud en el sistema.</p>
+                        <p>Saludos,</p>
+                        <p>${this.user.chrNombre} ${this.user.chrPaterno}</p>`,
+              response: { chrNombre: value.nombre_colaborador, chrPaterno: '', chrMaterno: '' },
+              textButton: '',
+              url: ''
+            }
+          };
+          this.correosService.sendCorreoElectronico(data).subscribe({
+            next: () => {
+              this.toastService.success('Correo de notificación enviado al jefe.');
+            },
+            error: (err) => {
+              this.toastService.error('Error al enviar correo: ' + err.message);
+            }
+          });
+          
 
         },
         error: (err) => {

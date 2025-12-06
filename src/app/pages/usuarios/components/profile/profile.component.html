@@ -1,15 +1,14 @@
 <div class="flex justify-center mt-8">
-  <div class="w-full max-w-4xl bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-2xl overflow-hidden">
+  <div
+    class="w-full max-w-4xl bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-2xl overflow-hidden">
 
     <!-- Banner superior -->
     <div class="relative h-40 bg-gradient-to-r from-primary-400 to-primary-600">
       <div class="absolute -bottom-16 left-1/2 transform -translate-x-1/2 md:left-12 md:translate-x-0">
         <p-avatar
           [image]="usuario.chrFoto ? usuario.chrFoto : 'https://img.freepik.com/vecteurs-premium/it-specialist-vector-character-flat-style-illustration_1033579-67109.jpg'"
-          shape="circle"
-          [style]="{ width: '130px', height: '130px', 'object-fit': 'cover' }"
-          styleClass="border-4 border-surface-0 dark:border-surface-900 shadow-3"
-        ></p-avatar>
+          shape="circle" [style]="{ width: '130px', height: '130px', 'object-fit': 'cover' }"
+          styleClass="border-4 border-surface-0 dark:border-surface-900 shadow-3"></p-avatar>
       </div>
     </div>
 
@@ -29,18 +28,29 @@
         </div>
 
         <div class="flex gap-2 justify-center md:justify-end">
-          <p-tag
-            [value]="usuario.chrTipoUsuario"
-            severity="info"
-            icon="pi pi-user"
-          ></p-tag>
-          <p-tag
-            [value]="usuario.chrStatus"
-            [severity]="usuario.chrStatus === 'Activo' ? 'success' : 'danger'"
-            icon="pi pi-check-circle"
-          ></p-tag>
+          <p-tag [value]="usuario.chrTipoUsuario" severity="info" icon="pi pi-user"></p-tag>
+          <p-tag [value]="usuario.chrStatus" [severity]="usuario.chrStatus === 'Activo' ? 'success' : 'danger'"
+            icon="pi pi-check-circle"></p-tag>
+        </div>
+
+
+
+      </div>
+      <!-- Contenido 
+      <div class="mt-4">
+        <h3 class="text-lg font-semibold text-surface-800 dark:text-surface-100 mb-2">Permisos del usuario:</h3>
+
+        <div class="flex flex-wrap gap-2">
+          <span
+            *ngFor="let permiso of permisos"
+            class="px-3 py-1 rounded-full text-xs font-semibold bg-primary-100 dark:bg-primary-700 text-primary-800 dark:text-primary-100 flex items-center gap-2"
+          >
+            <i class="pi pi-shield"></i>
+            {{ permiso.chrclaveperfil | titlecase }}
+          </span>
         </div>
       </div>
+-->
     </div>
 
     <!-- Contenido -->
@@ -48,7 +58,8 @@
 
       <!-- Información personal -->
       <section>
-        <h3 class="text-lg font-semibold text-surface-800 dark:text-surface-100 mb-4 border-b border-surface-200 dark:border-surface-700 pb-2 flex items-center gap-2">
+        <h3
+          class="text-lg font-semibold text-surface-800 dark:text-surface-100 mb-4 border-b border-surface-200 dark:border-surface-700 pb-2 flex items-center gap-2">
           <i class="pi pi-id-card text-primary-500"></i>
           Información personal
         </h3>
@@ -57,7 +68,8 @@
           <p><span class="font-semibold">CURP:</span> {{ usuario.chrCurp || '-' }}</p>
           <p><span class="font-semibold">RFC:</span> {{ usuario.chrRFC || '-' }}</p>
           <p><span class="font-semibold">Género:</span> {{ usuario.chrGenero || '-' }}</p>
-          <p><span class="font-semibold">Fecha de nacimiento:</span> {{ usuario.dtFechaNacimiento | date:'mediumDate' }}</p>
+          <p><span class="font-semibold">Fecha de nacimiento:</span> {{ usuario.dtFechaNacimiento | date:'mediumDate' }}
+          </p>
           <p><span class="font-semibold">Estado civil:</span> {{ usuario.chrEstadoCivil || '-' }}</p>
           <p><span class="font-semibold">Tipo de sangre:</span> {{ usuario.chrTipodesangre || '-' }}</p>
           <p><span class="font-semibold">Nacionalidad:</span> {{ usuario.chrNacionalidad || '-' }}</p>
@@ -66,7 +78,8 @@
 
       <!-- Contacto -->
       <section>
-        <h3 class="text-lg font-semibold text-surface-800 dark:text-surface-100 mb-4 border-b border-surface-200 dark:border-surface-700 pb-2 flex items-center gap-2">
+        <h3
+          class="text-lg font-semibold text-surface-800 dark:text-surface-100 mb-4 border-b border-surface-200 dark:border-surface-700 pb-2 flex items-center gap-2">
           <i class="pi pi-phone text-primary-500"></i>
           Contacto
         </h3>
@@ -77,13 +90,15 @@
           <p class="col-span-2"><span class="font-semibold">Domicilio:</span> {{ usuario.chrDomicilio || '-' }}</p>
           <p><span class="font-semibold">Contacto de emergencia:</span> {{ usuario.chrEmergenciasnombre || '-' }}</p>
           <p><span class="font-semibold">Tel. emergencia:</span> {{ usuario.chrEmergenciastelefono || '-' }}</p>
-          <p class="col-span-2"><span class="font-semibold">Dirección emergencia:</span> {{ usuario.chrEmergenciasdireccion || '-' }}</p>
+          <p class="col-span-2"><span class="font-semibold">Dirección emergencia:</span> {{
+            usuario.chrEmergenciasdireccion || '-' }}</p>
         </div>
       </section>
 
       <!-- Información laboral -->
       <section>
-        <h3 class="text-lg font-semibold text-surface-800 dark:text-surface-100 mb-4 border-b border-surface-200 dark:border-surface-700 pb-2 flex items-center gap-2">
+        <h3
+          class="text-lg font-semibold text-surface-800 dark:text-surface-100 mb-4 border-b border-surface-200 dark:border-surface-700 pb-2 flex items-center gap-2">
           <i class="pi pi-briefcase text-primary-500"></i>
           Información laboral
         </h3>
@@ -93,7 +108,8 @@
           <p><span class="font-semibold">Tipo de horario:</span> {{ usuario.chrTipodehorario || '-' }}</p>
           <p><span class="font-semibold">Fecha de ingreso:</span> {{ usuario.dtFechadeingreso | date:'mediumDate' }}</p>
           <p><span class="font-semibold">Alta IMSS:</span> {{ usuario.dtFechadealtaimss | date:'mediumDate' }}</p>
-          <p><span class="font-semibold">Número de seguro social:</span> {{ usuario.chrNumerodeseguridadsocial || '-' }}</p>
+          <p><span class="font-semibold">Número de seguro social:</span> {{ usuario.chrNumerodeseguridadsocial || '-' }}
+          </p>
           <p><span class="font-semibold">Sueldo:</span> {{ usuario.fltSueldo | currency:'MXN' }}</p>
           <p><span class="font-semibold">Ciclo:</span> {{ usuario.cveCiclo || '-' }}</p>
           <p><span class="font-semibold">Modalidad:</span> {{ usuario.chrModalidad || '-' }}</p>

@@ -20,6 +20,10 @@ import { Permisos } from '../../interfaces/permisos.interface';
 import { PermisosService } from '../../services/permisos.service';
 import { ToastService } from '../../../../shared/services/toastService.service';
 import { FiltroEstadoPipe } from '../../../../shared/pipes/filtro-estado.pipe';
+import { User } from '../../../auth/interfaces/user';
+import { getDatosUsuario } from '../../../../shared/helpers/permisos.helper';
+import { CorreosService } from '../../../../shared/services/correos/correos.service';
+import { CorreosRequest } from '../../../../layout/interfaces/correos';
 
 @Component({
   selector: 'app-autorizaciones',
@@ -56,7 +60,8 @@ export class AutorizacionesComponent implements OnInit {
   private permisosService = inject(PermisosService);
   private toastService = inject(ToastService);
   private confirmService = inject(ConfirmationService);
-
+  private correosService = inject(CorreosService);
+  public usuario: User = getDatosUsuario();
   ngOnInit(): void {
     this.cargarPermisos();
   }
@@ -64,7 +69,8 @@ export class AutorizacionesComponent implements OnInit {
   cargarPermisos(): void {
     this.permisosService.getAll().subscribe({
       next: (response) => {
-        this.lstPermisos = response.data;
+        this.lstPermisos = response.data.filter(permiso => permiso.correo_jefe === this.usuario.chrEmail);
+
       }
     });
   }
@@ -88,9 +94,32 @@ export class AutorizacionesComponent implements OnInit {
   autorizarPermiso(permiso: Permisos): void {
     this.permisosService.updateStatus(permiso.id!, 'Autorizado').subscribe({
       next: (res) => {
-          permiso.estado = 'Autorizado';
-          this.toastService.success('Permiso autorizado correctamente');
-          this.cargarPermisos();
+        permiso.estado = 'Autorizado';
+        this.toastService.success('Permiso autorizado correctamente');
+        let data: CorreosRequest = {
+          data: {
+            correo: permiso.correo_electronico!,
+            asunto: 'Permiso Autorizado',
+            body: `<p>Tu permiso ha sido autorizado.</p>
+                     <p>Motivo: ${permiso.motivo_permiso}</p>
+                      <p>Fechas: ${permiso.fecha_inicio} al ${permiso.fecha_fin}</p>
+                      <p>Saludos,</p>
+                      <p>${this.usuario.chrNombre} ${this.usuario.chrPaterno}</p>`,
+            response: { chrNombre: permiso.nombre_colaborador, chrPaterno: '', chrMaterno: '' },
+            textButton: '',
+            url: ''
+          }
+        };
+        this.correosService.sendCorreoElectronico(data).subscribe({
+          next: () => {
+            this.toastService.success('Correo de notificación enviado al colaborador.');
+          },
+          error: (err) => {
+            this.toastService.error('Error al enviar correo: ' + err.message);
+          }
+        });
+
+        this.cargarPermisos();
       },
       error: (err) => this.toastService.error('Error al autorizar: ' + err.message)
     });
@@ -99,9 +128,32 @@ export class AutorizacionesComponent implements OnInit {
   rechazarPermiso(permiso: Permisos): void {
     this.permisosService.updateStatus(permiso.id!, 'Rechazado').subscribe({
       next: (res) => {
-          permiso.estado = 'Rechazado';
-          this.toastService.info('Permiso rechazado');
-          this.cargarPermisos();
+        permiso.estado = 'Rechazado';
+        this.toastService.info('Permiso rechazado');
+        let data: CorreosRequest = {
+          data: {
+            correo: permiso.correo_electronico!,
+            asunto: 'Permiso Rechazado',
+            body: `<p>Tu permiso ha sido rechazado.</p>
+                      <p>Motivo: ${permiso.motivo_permiso}</p>
+                      <p>Fechas: ${permiso.fecha_inicio} al ${permiso.fecha_fin}</p>
+                      <p>Saludos,</p>
+                      <p>${this.usuario.chrNombre} ${this.usuario.chrPaterno}</p>`,
+            response: { chrNombre: permiso.nombre_colaborador, chrPaterno: '', chrMaterno: '' },
+            textButton: '',
+            url: ''
+          }
+        };
+        this.correosService.sendCorreoElectronico(data).subscribe({
+          next: () => {
+            this.toastService.success('Correo de notificación enviado al colaborador.');
+          },
+          error: (err) => {
+            this.toastService.error('Error al enviar correo: ' + err.message);
+          }
+        });
+
+        this.cargarPermisos();
       },
       error: (err) => this.toastService.error('Error al rechazar: ' + err.message)
     });

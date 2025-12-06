@@ -73,9 +73,9 @@ export class AuthService {
       .pipe(catchError((err) => throwError(() => err)));
   }
 
-  public getPermisosUsuario(): Observable<any[]> {
+  public getPermisosUsuario(): Observable<any> {
     return this.http
-      .get<any[]>(`${this.ENDPOIN_VALIDATE}getPermisosUsuario`)
+      .get<any>(`${this.ENDPOIN_VALIDATE}getPermisosUsuario`)
       .pipe(catchError((err) => {
         this.toastService.error(err.status);
         return of([]);
